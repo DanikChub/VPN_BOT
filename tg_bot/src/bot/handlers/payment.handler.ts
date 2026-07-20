@@ -63,19 +63,32 @@ export async function buyPlanHandler(
         );
 
 
+    const {
+        orderId,
+        paymentId,
+        paymentUrl
+    } = orderResponse.data;
+
+
     await ctx.reply(
         [
             "💳 Заказ создан",
             "",
-            "Ссылка на оплату:",
-            orderResponse.data.paymentUrl
+            "Нажмите кнопку ниже для оплаты.",
+            "После оплаты нажмите «Проверить оплату»."
         ].join("\n"),
 
         Markup.inlineKeyboard([
             [
+                Markup.button.url(
+                    "💳 Оплатить",
+                    paymentUrl
+                )
+            ],
+            [
                 Markup.button.callback(
-                    "✅ Я оплатил",
-                    `check_payment_${orderResponse.data.paymentId}`
+                    "🔄 Проверить оплату",
+                    `check_payment_${paymentId}`
                 )
             ]
         ])

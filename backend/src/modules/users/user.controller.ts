@@ -36,6 +36,7 @@ class UserController {
             telegramId: user.telegramId,
             username: user.username,
             firstName: user.firstName,
+            balanceAmount: user.balance_amount
         });
     }
 }

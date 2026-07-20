@@ -1,35 +1,64 @@
-import {NextFunction, Request, Response} from "express";
+import {
+    NextFunction,
+    Request,
+    Response
+} from "express";
 
-import paymentService from "./payment.service";
+import paymentService
+    from "./payment.service";
 
 
 class PaymentController {
 
-
-    async fakeSuccess(
+    async getStatus(
         req: Request,
         res: Response,
         next: NextFunction
     ) {
         try {
             const paymentId =
-                Number(req.body.paymentId);
+                Number(req.params.paymentId);
 
-
-            await paymentService.markSuccessful(
-                paymentId
-            );
-
+            const payment =
+                await paymentService.getStatus(
+                    paymentId
+                );
 
             res.json({
-                success: true
+                paymentId: payment.id,
+                status: payment.status
             });
 
-        } catch(error) {
+        } catch (error) {
             next(error);
         }
     }
 
+    async check(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const paymentId =
+                Number(req.params.paymentId);
+
+
+            const payment =
+                await paymentService.checkAndConfirm(
+                    paymentId
+                );
+
+
+            res.json({
+                paymentId: payment.id,
+                status: payment.status
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 

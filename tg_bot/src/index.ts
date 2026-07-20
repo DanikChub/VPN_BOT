@@ -2,23 +2,16 @@ import "dotenv/config";
 
 import { Telegraf } from "telegraf";
 
+import {helpHandler} from "./bot/handlers/help.handler";
+import {mainMenuHandler} from "./bot/handlers/main-menu.handler";
+import {connectVpnHandler} from "./bot/handlers/connect-vpn.handler";
 import {
-    mainKeyboard
-} from "./bot/keyboards/main.keyboard";
-
-
-import {
-    buyVpnHandler,
-    buyPlanHandler
-} from "./bot/handlers/payment.handler";
-
-
-import {
-    subscriptionHandler
-} from "./bot/handlers/subscription.handler";
-
-
-import backendApi from "./api/backend.api";
+    createPaymentHandler,
+    selectPaymentMethodHandler,
+    selectTopUpAmountHandler,
+    topUpBalanceHandler
+} from "./bot/handlers/top-up.handler";
+import {subscriptionHandler} from "./bot/handlers/subscription.handler";
 
 
 const token = process.env.BOT_TOKEN;
@@ -34,95 +27,80 @@ if(!token){
 const bot = new Telegraf(token);
 
 
-
-bot.start(async(ctx)=>{
-
-    const response =
-        await backendApi.post(
-            "/api/users/telegram",
-            {
-                telegramId:
-                    String(ctx.from.id),
-
-                username:
-                    ctx.from.username ?? null,
-
-                firstName:
-                    ctx.from.first_name ?? null,
-            }
-        );
-
-
-    await ctx.reply(
-        [
-            `Привет, ${ctx.from.first_name} 👋`,
-            "",
-            `Ваш ID: ${response.data.id}`
-        ].join("\n"),
-        mainKeyboard
-    );
-
-});
-
-
+bot.start(mainMenuHandler);
 
 bot.action(
-    "buy_vpn",
-    buyVpnHandler
+    "main_menu",
+    mainMenuHandler
 );
 
-
-
 bot.action(
-    "buy_plan_1",
-    (ctx)=>
-        buyPlanHandler(ctx,1)
+    "connect_vpn",
+    connectVpnHandler
 );
 
-
-
 bot.action(
-    "buy_plan_2",
-    (ctx)=>
-        buyPlanHandler(ctx,2)
+    "top_up_balance",
+    topUpBalanceHandler
 );
 
-
-
 bot.action(
-    "subscription",
+    "my_subscription",
     subscriptionHandler
 );
 
 bot.action(
-    /^check_payment_(\d+)$/,
-    async(ctx)=>{
+    "help",
+    helpHandler
+);
 
-        await ctx.answerCbQuery();
 
-
-        const paymentId =
+bot.action(
+    /^top_up_amount_(\d+)$/,
+    async ctx => {
+        const amount =
             Number(ctx.match[1]);
 
-
-        await backendApi.post(
-            "/api/payments/fake-success",
-            {
-                paymentId
-            }
-        );
-
-
-        await ctx.reply(
-            [
-                "🎉 Оплата подтверждена!",
-                "",
-                "VPN активирован 🚀"
-            ].join("\n")
+        await selectTopUpAmountHandler(
+            ctx,
+            amount
         );
     }
 );
 
+bot.action(
+    /^payment_method_([a-z_]+)_(\d+)$/,
+    async ctx => {
+        const method =
+            ctx.match[1];
+
+        const amount =
+            Number(ctx.match[2]);
+
+        await selectPaymentMethodHandler(
+            ctx,
+            method,
+            amount
+        );
+    }
+);
+
+bot.action(
+    /^create_payment_([a-z_]+)_(\d+)$/,
+    async ctx => {
+        const method =
+            ctx.match[1];
+
+        const amount =
+            Number(ctx.match[2]);
+
+        await createPaymentHandler(
+            ctx,
+            method,
+            amount
+        );
+    }
+);
 
 void bot.launch();
 

@@ -1,11 +1,10 @@
-import {Context, Markup} from "telegraf";
+import { Context, Markup } from "telegraf";
+
 import backendApi from "../../api/backend.api";
 
-
-export async function subscriptionHandler(
+export async function showBalanceHandler(
     ctx: Context
-){
-
+) {
     await ctx.answerCbQuery();
 
     const telegramId =
@@ -45,5 +44,4 @@ export async function subscriptionHandler(
             ],
         ])
     );
-
 }

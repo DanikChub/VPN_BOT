@@ -8,7 +8,9 @@ export const initDatabase = async (): Promise<void> => {
 
     console.log("Database connected");
 
-    await sequelize.sync();
+    await sequelize.sync({
+        alter: true,
+    });
 
     console.log("Database synchronized");
 };

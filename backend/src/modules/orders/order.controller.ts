@@ -5,7 +5,8 @@ import {
 } from "express";
 
 import orderService from "./order.service";
-import paymentService from "../payments/payment.service";
+import paymentService
+    from "../payments/payment.service";
 
 
 class OrderController {
@@ -30,23 +31,22 @@ class OrderController {
                 );
 
 
-            const payment =
+            const {
+                payment,
+                paymentUrl
+            } =
                 await paymentService.create(
                     order.id
                 );
 
 
-            res.json({
+            res.status(201).json({
                 orderId: order.id,
-
                 paymentId: payment.id,
-
-                paymentUrl:
-                    `http://fake-payment/${payment.id}`
+                paymentUrl
             });
 
-
-        } catch(error) {
+        } catch (error) {
             next(error);
         }
     }

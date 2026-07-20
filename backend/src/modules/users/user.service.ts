@@ -1,17 +1,19 @@
 import User from "./user.model";
+import balanceService from "../balances/balance.service";
 
 
 interface FindOrCrateTelegramUserPayload {
     telegramId: string;
     username: string | null;
     firstName: string | null;
+
 }
 
 class UserService {
     async findOrCreateTelegramUser(
         payload: FindOrCrateTelegramUserPayload,
     ) {
-        const [user] = await User.findOrCreate({
+        const [user, created] = await User.findOrCreate({
             where: {
                 telegramId: payload.telegramId,
             },
@@ -22,6 +24,13 @@ class UserService {
                 firstName: payload.firstName,
             }
         });
+
+        if (created) {
+            await balanceService.addWelcomeBonus(
+                user.id
+            );
+
+        }
 
         return user;
     }

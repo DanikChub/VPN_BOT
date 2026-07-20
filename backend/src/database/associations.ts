@@ -4,6 +4,7 @@ import VpnCredential from "../modules/vpn/vpn-credential.model";
 import Order from "../modules/orders/order.model";
 import Plan from "../modules/plans/plan.model";
 import Payment from "../modules/payments/payment.model";
+import BalanceTransaction from "../modules/balances/balance-transaction.model";
 
 export const initAssociations = (): void => {
     User.hasOne(Subscription, {
@@ -52,5 +53,15 @@ export const initAssociations = (): void => {
 
     Payment.belongsTo(Order, {
         foreignKey: "order_id",
+    });
+
+    User.hasMany(BalanceTransaction, {
+        foreignKey: "user_id",
+        as: "balance_transactions",
+    });
+
+    BalanceTransaction.belongsTo(User, {
+        foreignKey: "user_id",
+        as: "user",
     });
 };

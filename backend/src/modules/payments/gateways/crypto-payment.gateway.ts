@@ -1,51 +1,135 @@
+import axios, {
+    AxiosInstance
+} from "axios";
 
 import {
-    PaymentGateway,
     CreatePaymentInput,
-    CreatePaymentResult
+    CreatePaymentResult,
+    PaymentGateway
 } from "../payment-gateway.interface";
-import axios from "axios";
+
+
+interface CryptoPayResponse<T> {
+    ok: boolean;
+    result?: T;
+    error?: {
+        code: number;
+        name: string;
+    };
+}
+
+
+interface CryptoPayInvoice {
+    invoice_id: number;
+    status: "active" | "paid" | "expired";
+
+    bot_invoice_url: string;
+    mini_app_invoice_url?: string;
+    web_app_invoice_url?: string;
+
+    amount: string;
+    currency_type: "crypto" | "fiat";
+
+    fiat?: string;
+    asset?: string;
+
+    payload?: string;
+    expiration_date?: string;
+}
+
+interface CryptoPayInvoicesResult {
+    items: CryptoPayInvoice[];
+}
+
 
 
 class CryptoPaymentGateway
     implements PaymentGateway {
 
-
     readonly name = "crypto_bot";
+
+    private readonly api: AxiosInstance;
+
+
+    constructor() {
+        const token =
+            process.env.CRYPTO_PAY_TOKEN;
+
+        const baseURL =
+            process.env.CRYPTO_PAY_API_URL;
+
+
+        if (!token) {
+            throw new Error(
+                "CRYPTO_PAY_TOKEN is not configured"
+            );
+        }
+
+        if (!baseURL) {
+            throw new Error(
+                "CRYPTO_PAY_API_URL is not configured"
+            );
+        }
+
+
+        this.api = axios.create({
+            baseURL,
+            timeout: 10_000,
+            headers: {
+                "Crypto-Pay-API-Token": token,
+                "Content-Type": "application/json"
+            }
+        });
+    }
 
 
     async createPayment(
         input: CreatePaymentInput
     ): Promise<CreatePaymentResult> {
 
-
         const response =
-            await axios.post(
-                `${process.env.CRYPTO_PAY_URL}/createInvoice`,
+            await this.api.post<
+                CryptoPayResponse<CryptoPayInvoice>
+            >(
+                "/createInvoice",
                 {
-                    asset: "USDT",
+                    currency_type: "fiat",
+
+                    fiat: input.currency,
 
                     amount:
-                    input.amount,
+                        input.amount.toFixed(2),
+
+                    accepted_assets:
+                        "USDT,TON",
 
                     description:
                     input.description,
 
-                    payload:
-                        JSON.stringify({
-                            paymentId:
-                            input.paymentId
-                        }),
+                    payload: JSON.stringify({
+                        paymentId:
+                        input.paymentId
+                    }),
 
-                    expires_in:3600
-                },
-                {
-                    headers:{
-                        "Crypto-Pay-API-Token":
-                        process.env.CRYPTO_PAY_TOKEN
-                    }
+                    expires_in: 1800,
+
+                    allow_comments: false,
+                    allow_anonymous: false
                 }
             );
+
+
+        if (
+            !response.data.ok ||
+            !response.data.result
+        ) {
+            throw new Error(
+                `Crypto Pay error: ${
+                    response.data.error?.name
+                    ?? "UNKNOWN_ERROR"
+                }`
+            );
+        }
 
 
         const invoice =
@@ -53,15 +137,52 @@ class CryptoPaymentGateway
 
 
         return {
-
             externalPaymentId:
                 String(invoice.invoice_id),
 
             paymentUrl:
-            invoice.pay_url
+            invoice.bot_invoice_url
         };
     }
 
+    async getInvoice(
+        externalPaymentId: string
+    ): Promise<CryptoPayInvoice | null> {
+
+        const response =
+            await this.api.get<
+                CryptoPayResponse<
+                    CryptoPayInvoicesResult
+                >
+            >(
+                "/getInvoices",
+                {
+                    params: {
+                        invoice_ids:
+                        externalPaymentId
+                    }
+                }
+            );
+
+
+        if (
+            !response.data.ok ||
+            !response.data.result
+        ) {
+            throw new Error(
+                `Crypto Pay error: ${
+                    response.data.error?.name
+                    ?? "UNKNOWN_ERROR"
+                }`
+            );
+        }
+
+
+        return (
+            response.data.result.items[0]
+            ?? null
+        );
+    }
 }
 
 

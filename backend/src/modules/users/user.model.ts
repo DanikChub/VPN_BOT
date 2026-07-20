@@ -15,8 +15,13 @@ class User extends Model<
     declare id: CreationOptional<number>;
 
     declare telegramId: string;
+
+    declare balance_amount: CreationOptional<number>;
+
+
     declare username: string | null;
     declare firstName: string | null;
+
 
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -35,6 +40,12 @@ User.init(
             allowNull: false,
             unique: true,
             field: "telegram_id",
+        },
+
+        balance_amount: {
+            type: DataTypes.BIGINT,
+            allowNull: false,
+            defaultValue: 0,
         },
 
         username: {

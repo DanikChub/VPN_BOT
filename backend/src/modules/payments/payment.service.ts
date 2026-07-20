@@ -93,6 +93,9 @@ class PaymentService {
             );
         }
 
+        if (payment.status === "successful") {
+            return;
+        }
 
 
         const order =
@@ -139,6 +142,85 @@ class PaymentService {
             order.user_id,
             plan.duration_days
         );
+    }
+
+    async getStatus(
+        paymentId: number
+    ) {
+        const payment =
+            await Payment.findByPk(
+                paymentId
+            );
+
+        if (!payment) {
+            throw new Error(
+                "Payment not found"
+            );
+        }
+
+        return payment;
+    }
+
+    async checkAndConfirm(
+        paymentId: number
+    ) {
+        const payment =
+            await Payment.findByPk(
+                paymentId
+            );
+
+        if (!payment) {
+            throw new Error(
+                "Payment not found"
+            );
+        }
+
+
+        if (
+            payment.status ===
+            "successful"
+        ) {
+            return payment;
+        }
+
+
+        if (
+            !payment.provider_payment_id
+        ) {
+            throw new Error(
+                "Provider payment ID is missing"
+            );
+        }
+
+
+        const invoice =
+            await cryptoPaymentGateway.getInvoice(
+                payment.provider_payment_id
+            );
+
+
+        if (!invoice) {
+            throw new Error(
+                "Crypto Pay invoice not found"
+            );
+        }
+
+
+        if (
+            invoice.status !== "paid"
+        ) {
+            return payment;
+        }
+
+
+        await this.markSuccessful(
+            payment.id
+        );
+
+
+        await payment.reload();
+
+        return payment;
     }
 
 }
