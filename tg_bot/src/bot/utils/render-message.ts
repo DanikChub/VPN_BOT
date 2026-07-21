@@ -1,18 +1,30 @@
-import { Context } from "telegraf";
+import {
+    Context,
+} from "telegraf";
 
 export async function answerCallback(
-    ctx: Context
-) {
-    if (ctx.callbackQuery) {
-        await ctx.answerCbQuery();
+    ctx: Context,
+    text?: string
+): Promise<void> {
+    if (!ctx.callbackQuery) {
+        return;
+    }
+
+    try {
+        await ctx.answerCbQuery(text);
+    } catch (error) {
+        console.error(
+            "ANSWER CALLBACK ERROR:",
+            error
+        );
     }
 }
 
 export async function renderMessage(
     ctx: Context,
     text: string,
-    keyboard: object
-) {
+    keyboard: object = {}
+): Promise<void> {
     if (ctx.callbackQuery) {
         try {
             await ctx.editMessageText(
@@ -22,17 +34,23 @@ export async function renderMessage(
 
             return;
         } catch (error: any) {
-            /**
-             * Telegram ругается, если текст и клавиатура
-             * вообще не изменились. Это можно игнорировать.
-             */
+            const description =
+                error?.description ??
+                error?.response?.description ??
+                "";
+
             if (
-                error?.description?.includes(
+                description.includes(
                     "message is not modified"
                 )
             ) {
                 return;
             }
+
+            console.error(
+                "EDIT MESSAGE ERROR:",
+                description || error
+            );
         }
     }
 

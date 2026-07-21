@@ -5,8 +5,7 @@ import {
 } from "express";
 
 import orderService from "./order.service";
-import paymentService
-    from "../payments/payment.service";
+
 
 
 class OrderController {
@@ -24,26 +23,20 @@ class OrderController {
             } = req.body;
 
 
+
+
             const order =
                 await orderService.create(
                     userId,
                     planId
                 );
 
-
-            const {
-                payment,
-                paymentUrl
-            } =
-                await paymentService.create(
-                    order.id
-                );
-
-
             res.status(201).json({
-                orderId: order.id,
-                paymentId: payment.id,
-                paymentUrl
+                id: order.id,
+                plan_name: order.plan_name,
+                duration_days: order.duration_days,
+                amount: order.amount,
+                currency: order.currency,
             });
 
         } catch (error) {

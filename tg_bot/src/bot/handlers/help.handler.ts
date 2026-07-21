@@ -8,9 +8,10 @@ import {
     renderMessage,
 } from "../utils/render-message";
 
+
 export async function helpHandler(
     ctx: Context
-) {
+): Promise<void> {
     await answerCallback(ctx);
 
     await renderMessage(

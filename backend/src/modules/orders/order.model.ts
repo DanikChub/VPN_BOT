@@ -26,6 +26,9 @@ class Order extends Model<
     declare amount: number;
     declare currency: string;
 
+    declare duration_days: number;
+    declare plan_name: string;
+
     declare status: CreationOptional<OrderStatus>;
 
     declare created_at: CreationOptional<Date>;
@@ -57,6 +60,16 @@ Order.init(
 
         currency: {
             type: DataTypes.STRING(3),
+            allowNull: false,
+        },
+
+        duration_days: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+
+        plan_name: {
+            type: DataTypes.STRING(100),
             allowNull: false,
         },
 

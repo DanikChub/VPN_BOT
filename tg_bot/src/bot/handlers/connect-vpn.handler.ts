@@ -3,11 +3,11 @@ import {
     Markup,
 } from "telegraf";
 
-import backendApi from "../../api/backend.api";
+import axios from "axios";
+import QRCode from "qrcode";
 
-import {
-    insufficientBalanceKeyboard,
-} from "../keyboards/main.keyboard";
+import backendApi
+    from "../../api/backend.api";
 
 import {
     answerCallback,
@@ -18,27 +18,19 @@ import {
     getTelegramUserInfo,
 } from "../services/user-info.service";
 
-const DAILY_PRICE_AMOUNT = 500;
 
-interface ActivateVpnResponse {
-    subscription_url: string;
+interface SubscriptionDetailsResponse {
+    id: number;
+    user_id: number;
+    status: "active" | "expired";
     expires_at: string;
+    subscription_url: string | null;
 }
 
-function formatMoney(
-    amount: number
-) {
-    return (
-        amount / 100
-    ).toLocaleString("ru-RU", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-}
 
 function formatDate(
     value: string
-) {
+): string {
     const date =
         new Date(value);
 
@@ -60,9 +52,10 @@ function formatDate(
     );
 }
 
+
 export async function connectVpnHandler(
     ctx: Context
-) {
+): Promise<void> {
     await answerCallback(ctx);
 
     if (!ctx.from) {
@@ -77,97 +70,155 @@ export async function connectVpnHandler(
                 ctx.from.first_name
             );
 
-        const balanceAmount =
-            Number(
-                user.balanceAmount ?? 0
+        const response =
+            await backendApi.get<SubscriptionDetailsResponse>(
+                `/api/subscription/user/${user.id}/details`
             );
 
-        if (
-            balanceAmount <
-            DAILY_PRICE_AMOUNT
-        ) {
+        const subscription =
+            response.data;
+
+        const expiresAt =
+            new Date(
+                subscription.expires_at
+            );
+
+        const isActive =
+            subscription.status === "active" &&
+            !Number.isNaN(
+                expiresAt.getTime()
+            ) &&
+            expiresAt.getTime() >
+            Date.now();
+
+        if (!isActive) {
             await renderMessage(
                 ctx,
                 [
-                    "❌ Недостаточно средств",
+                    "🔴 Нет активной подписки",
                     "",
-                    `Ваш баланс: ${formatMoney(
-                        balanceAmount
-                    )} ₽`,
-                    "",
-                    `Для подключения необходимо минимум ${formatMoney(
-                        DAILY_PRICE_AMOUNT
-                    )} ₽.`,
+                    "Для подключения VPN необходимо приобрести или продлить подписку.",
                 ].join("\n"),
-                insufficientBalanceKeyboard
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(
+                            "💳 Купить подписку",
+                            "extend_subscription"
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            "◀️ Главное меню",
+                            "main_menu"
+                        ),
+                    ],
+                ])
             );
 
             return;
         }
 
-        const response =
-            await backendApi.post<ActivateVpnResponse>(
-                "/api/vpn/access",
-                {
-                    user_id: user.id,
-                }
-            );
+        const subscriptionUrl =
+            subscription.subscription_url;
 
-        const {
-            subscription_url,
-            expires_at,
-        } = response.data;
-
-        if (!subscription_url) {
+        if (!subscriptionUrl) {
             throw new Error(
                 "Backend did not return subscription_url"
             );
         }
 
-        await renderMessage(
-            ctx,
-            [
-                "✅ VPN готов к подключению",
-                "",
-                `Баланс: ${formatMoney(
-                    balanceAmount
-                )} ₽`,
-                `Подписка активна до: ${formatDate(
-                    expires_at
-                )}`,
-                "",
-                "Нажмите кнопку ниже, чтобы добавить VPN на устройство.",
-            ].join("\n"),
-            Markup.inlineKeyboard([
-                [
-                    Markup.button.url(
-                        "🔌 Подключить VPN",
-                        subscription_url
-                    ),
-                ],
-                [
-                    Markup.button.callback(
-                        "◀️ Назад",
-                        "main_menu"
-                    ),
-                ],
-            ])
+        const qrCodeBuffer =
+            await QRCode.toBuffer(
+                subscriptionUrl,
+                {
+                    type: "png",
+                    width: 700,
+                    margin: 2,
+                    errorCorrectionLevel: "M",
+                }
+            );
+
+        await ctx.replyWithPhoto(
+            {
+                source: qrCodeBuffer,
+            },
+            {
+                caption: [
+                    "🔑 Ваш ключ подключения",
+                    "",
+                    `📅 Подписка активна до: ${formatDate(
+                        subscription.expires_at
+                    )}`,
+                    "",
+                    "📎 Ссылка для подключения:",
+                    "",
+                    `<code>${subscriptionUrl}</code>`,
+                    "",
+                    "Отсканируйте QR-код в приложении или нажмите кнопку ниже.",
+                    "",
+                    "⚠️ Не передавайте эту ссылку другим людям.",
+                ].join("\n"),
+
+                parse_mode: "HTML",
+
+                ...Markup.inlineKeyboard([
+                    [
+                        Markup.button.url(
+                            "🔌 Подключить VPN",
+                            subscriptionUrl
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            "◀️ Главное меню",
+                            "main_menu"
+                        ),
+                    ],
+                ]),
+            }
         );
-    } catch (error: any) {
+    } catch (error) {
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            await renderMessage(
+                ctx,
+                [
+                    "🔴 Нет активной подписки",
+                    "",
+                    "Сначала приобретите подписку.",
+                ].join("\n"),
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(
+                            "💳 Купить подписку",
+                            "extend_subscription"
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            "◀️ Главное меню",
+                            "main_menu"
+                        ),
+                    ],
+                ])
+            );
+
+            return;
+        }
+
         console.error(
             "CONNECT VPN ERROR:",
-            error?.response?.data ??
-            error?.message ??
-            error
+            axios.isAxiosError(error)
+                ? error.response?.data
+                : error
         );
 
         await renderMessage(
             ctx,
             [
-                "⚠️ Не удалось подключить VPN",
-                "",
-                error?.response?.data?.message ??
-                "Произошла ошибка при создании подключения.",
+                "⚠️ Не удалось получить ссылку",
                 "",
                 "Попробуйте ещё раз.",
             ].join("\n"),
@@ -180,7 +231,7 @@ export async function connectVpnHandler(
                 ],
                 [
                     Markup.button.callback(
-                        "◀️ Назад",
+                        "◀️ Главное меню",
                         "main_menu"
                     ),
                 ],

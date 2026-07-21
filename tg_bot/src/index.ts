@@ -5,13 +5,11 @@ import { Telegraf } from "telegraf";
 import {helpHandler} from "./bot/handlers/help.handler";
 import {mainMenuHandler} from "./bot/handlers/main-menu.handler";
 import {connectVpnHandler} from "./bot/handlers/connect-vpn.handler";
-import {
-    createPaymentHandler,
-    selectPaymentMethodHandler,
-    selectTopUpAmountHandler,
-    topUpBalanceHandler
-} from "./bot/handlers/top-up.handler";
 import {subscriptionHandler} from "./bot/handlers/subscription.handler";
+import {plansHandler} from "./bot/handlers/plan.handler";
+import {selectPlanHandler} from "./bot/handlers/order.handler";
+import {paymentHandler} from "./bot/handlers/payment.handler";
+import {checkPaymentHandler} from "./bot/handlers/check-payment.handler";
 
 
 const token = process.env.BOT_TOKEN;
@@ -40,13 +38,64 @@ bot.action(
 );
 
 bot.action(
-    "top_up_balance",
-    topUpBalanceHandler
+    "subscription",
+    subscriptionHandler
 );
 
 bot.action(
-    "my_subscription",
-    subscriptionHandler
+    "extend_subscription",
+    plansHandler
+);
+
+bot.action(
+    /^select_plan:(\d+)$/,
+    async (ctx) => {
+
+        const planId =
+            Number(ctx.match[1]);
+
+
+        await selectPlanHandler(
+            ctx,
+            planId
+        );
+    }
+);
+
+bot.action(
+    /^pay:(\d+):(\d+)$/,
+    async (ctx) => {
+
+        const orderId =
+            Number(ctx.match[1]);
+
+        const paymentMethodId =
+            Number(ctx.match[2]);
+
+
+        await paymentHandler(
+            ctx,
+            orderId,
+            paymentMethodId
+        );
+    }
+);
+
+bot.action(
+    /^check_payment:(\d+)$/,
+    async (ctx) => {
+
+        const paymentId =
+            Number(
+                ctx.match[1]
+            );
+
+
+        await checkPaymentHandler(
+            ctx,
+            paymentId
+        );
+    }
 );
 
 bot.action(
@@ -54,53 +103,6 @@ bot.action(
     helpHandler
 );
 
-
-bot.action(
-    /^top_up_amount_(\d+)$/,
-    async ctx => {
-        const amount =
-            Number(ctx.match[1]);
-
-        await selectTopUpAmountHandler(
-            ctx,
-            amount
-        );
-    }
-);
-
-bot.action(
-    /^payment_method_([a-z_]+)_(\d+)$/,
-    async ctx => {
-        const method =
-            ctx.match[1];
-
-        const amount =
-            Number(ctx.match[2]);
-
-        await selectPaymentMethodHandler(
-            ctx,
-            method,
-            amount
-        );
-    }
-);
-
-bot.action(
-    /^create_payment_([a-z_]+)_(\d+)$/,
-    async ctx => {
-        const method =
-            ctx.match[1];
-
-        const amount =
-            Number(ctx.match[2]);
-
-        await createPaymentHandler(
-            ctx,
-            method,
-            amount
-        );
-    }
-);
 
 void bot.launch();
 

@@ -3,70 +3,99 @@ import {
     Response,
 } from "express";
 
-import Subscription from "../subscriptions/subscription.model";
-import VpnCredential from "./vpn-credential.model";
-import VpnNode from "../vpn-nodes/vpn-node.model";
-import vlessUrlService from "./vless-url.service";
+import Subscription
+    from "../subscriptions/subscription.model";
+
+import VpnCredential
+    from "./vpn-credential.model";
+
+import VpnNode
+    from "../vpn-nodes/vpn-node.model";
+
+import vlessUrlService
+    from "./vless-url.service";
+
 
 class VpnSubscriptionController {
+
     async getConfig(
         req: Request,
         res: Response
     ): Promise<void> {
-        const { token } = req.params;
+
+        const token =
+            String(req.params.token);
+
 
         const credential =
             await VpnCredential.findOne({
                 where: {
-                    subscription_token: token,
+                    subscription_token:
+                    token,
                 },
             });
 
+
         if (!credential) {
-            res.status(404).send(
-                "Subscription not found"
-            );
+            res
+                .status(404)
+                .send(
+                    "Subscription not found"
+                );
 
             return;
         }
+
 
         const subscription =
             await Subscription.findOne({
                 where: {
-                    user_id: credential.user_id,
+                    user_id:
+                    credential.user_id,
                 },
             });
+
 
         if (
             !subscription ||
             subscription.status !== "active" ||
-            subscription.expires_at.getTime() <
+            subscription.expires_at.getTime() <=
             Date.now()
         ) {
-            res.status(403).send(
-                "Subscription expired"
-            );
+            res
+                .status(403)
+                .send(
+                    "Subscription expired"
+                );
 
             return;
         }
 
-        const nodes = await VpnNode.findAll({
-            where: {
-                is_active: true,
-            },
-        });
 
-        const links = nodes.map((node) =>
-            vlessUrlService.build(
-                credential,
-                node
-            )
-        );
+        const nodes =
+            await VpnNode.findAll({
+                where: {
+                    is_active: true,
+                },
+            });
+
+
+        const links =
+            nodes.map((node) =>
+                vlessUrlService.build(
+                    credential,
+                    node
+                )
+            );
+
 
         res
-            .type("text/plain")
-            .send(links.join("\n"));
+            .type("text/plain; charset=utf-8")
+            .send(
+                links.join("\n")
+            );
     }
 }
+
 
 export default new VpnSubscriptionController();

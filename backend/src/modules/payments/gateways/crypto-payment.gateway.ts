@@ -3,6 +3,7 @@ import axios, {
 } from "axios";
 
 import {
+    CheckPaymentResult,
     CreatePaymentInput,
     CreatePaymentResult,
     PaymentGateway
@@ -11,7 +12,9 @@ import {
 
 interface CryptoPayResponse<T> {
     ok: boolean;
+
     result?: T;
+
     error?: {
         code: number;
         name: string;
@@ -21,14 +24,22 @@ interface CryptoPayResponse<T> {
 
 interface CryptoPayInvoice {
     invoice_id: number;
-    status: "active" | "paid" | "expired";
+
+    status:
+        | "active"
+        | "paid"
+        | "expired";
 
     bot_invoice_url: string;
+
     mini_app_invoice_url?: string;
     web_app_invoice_url?: string;
 
     amount: string;
-    currency_type: "crypto" | "fiat";
+
+    currency_type:
+        | "crypto"
+        | "fiat";
 
     fiat?: string;
     asset?: string;
@@ -37,18 +48,21 @@ interface CryptoPayInvoice {
     expiration_date?: string;
 }
 
+
 interface CryptoPayInvoicesResult {
     items: CryptoPayInvoice[];
 }
 
 
-
 class CryptoPaymentGateway
     implements PaymentGateway {
 
-    readonly name = "crypto_bot";
+    readonly name =
+        "crypto_bot";
 
-    private readonly api: AxiosInstance;
+
+    private readonly api:
+        AxiosInstance;
 
 
     constructor() {
@@ -65,6 +79,7 @@ class CryptoPaymentGateway
             );
         }
 
+
         if (!baseURL) {
             throw new Error(
                 "CRYPTO_PAY_API_URL is not configured"
@@ -72,14 +87,21 @@ class CryptoPaymentGateway
         }
 
 
-        this.api = axios.create({
-            baseURL,
-            timeout: 10_000,
-            headers: {
-                "Crypto-Pay-API-Token": token,
-                "Content-Type": "application/json"
-            }
-        });
+        this.api =
+            axios.create({
+                baseURL,
+
+                timeout:
+                    10_000,
+
+                headers: {
+                    "Crypto-Pay-API-Token":
+                    token,
+
+                    "Content-Type":
+                        "application/json",
+                },
+            });
     }
 
 
@@ -93,12 +115,16 @@ class CryptoPaymentGateway
             >(
                 "/createInvoice",
                 {
-                    currency_type: "fiat",
+                    currency_type:
+                        "fiat",
 
-                    fiat: input.currency,
+                    fiat:
+                    input.currency,
 
                     amount:
-                        input.amount.toFixed(2),
+                        (
+                            input.amount / 100
+                        ).toFixed(2),
 
                     accepted_assets:
                         "USDT,TON",
@@ -106,15 +132,20 @@ class CryptoPaymentGateway
                     description:
                     input.description,
 
-                    payload: JSON.stringify({
-                        paymentId:
-                        input.paymentId
-                    }),
+                    payload:
+                        JSON.stringify({
+                            paymentId:
+                            input.paymentId,
+                        }),
 
-                    expires_in: 1800,
+                    expires_in:
+                        1800,
 
-                    allow_comments: false,
-                    allow_anonymous: false
+                    allow_comments:
+                        false,
+
+                    allow_anonymous:
+                        false,
                 }
             );
 
@@ -138,14 +169,94 @@ class CryptoPaymentGateway
 
         return {
             externalPaymentId:
-                String(invoice.invoice_id),
+                String(
+                    invoice.invoice_id
+                ),
 
             paymentUrl:
-            invoice.bot_invoice_url
+            invoice.bot_invoice_url,
         };
     }
 
-    async getInvoice(
+
+    async checkPayment(
+        externalPaymentId: string
+    ): Promise<CheckPaymentResult> {
+
+        const invoice =
+            await this.getInvoice(
+                externalPaymentId
+            );
+
+
+        if (!invoice) {
+            throw new Error(
+                "Crypto Pay invoice not found"
+            );
+        }
+
+
+        const invoiceId =
+            String(
+                invoice.invoice_id
+            );
+
+
+        if (
+            invoiceId !==
+            externalPaymentId
+        ) {
+            throw new Error(
+                "Provider payment ID mismatch"
+            );
+        }
+
+
+        switch (invoice.status) {
+
+            case "active":
+                return {
+                    externalPaymentId:
+                    invoiceId,
+
+                    status:
+                        "pending",
+                };
+
+
+            case "paid":
+                return {
+                    externalPaymentId:
+                    invoiceId,
+
+                    status:
+                        "paid",
+                };
+
+
+            case "expired":
+                return {
+                    externalPaymentId:
+                    invoiceId,
+
+                    status:
+                        "expired",
+                };
+
+
+            default:
+                return {
+                    externalPaymentId:
+                    invoiceId,
+
+                    status:
+                        "failed",
+                };
+        }
+    }
+
+
+    private async getInvoice(
         externalPaymentId: string
     ): Promise<CryptoPayInvoice | null> {
 
@@ -159,8 +270,8 @@ class CryptoPaymentGateway
                 {
                     params: {
                         invoice_ids:
-                        externalPaymentId
-                    }
+                        externalPaymentId,
+                    },
                 }
             );
 

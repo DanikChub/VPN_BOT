@@ -1,96 +1,145 @@
-import { Context } from "telegraf";
-import { Markup } from "telegraf";
-import backendApi from "../../api/backend.api";
+import {
+    Context,
+    Markup,
+} from "telegraf";
+
+import backendApi
+    from "../../api/backend.api";
 
 import {
-    plansKeyboard
-} from "../keyboards/main.keyboard";
+    answerCallback,
+    renderMessage,
+} from "../utils/render-message";
 
 
-export async function buyVpnHandler(
-    ctx: Context
-) {
+interface CreatePaymentResponse {
+    paymentId: number;
 
-    await ctx.answerCbQuery();
+    orderId: number;
+    paymentMethodId: number;
 
+    paymentUrl: string | null;
 
-    await ctx.reply(
-        "Выберите тариф:",
-        plansKeyboard
-    );
+    amount: number;
+    currency: string;
+
+    status: string;
 }
 
 
+function formatPrice(
+    amount: number,
+    currency: string
+): string {
+    const currencySymbols:
+        Record<string, string> = {
+        RUB: "₽",
+        USD: "$",
+        EUR: "€",
+        USDT: "USDT",
+    };
 
-export async function buyPlanHandler(
+    const symbol =
+        currencySymbols[currency] ??
+        currency;
+
+    const price =
+        Number(amount) / 100;
+
+    return `${price}${symbol}`;
+}
+
+
+export async function paymentHandler(
     ctx: Context,
-    planId:number
-) {
+    orderId: number,
+    paymentMethodId: number
+): Promise<void> {
+    await answerCallback(ctx);
 
-    await ctx.answerCbQuery();
+    try {
+        const paymentResponse =
+            await backendApi.post<CreatePaymentResponse>(
+                "/api/payments/create",
+                {
+                    orderId,
+                    paymentMethodId,
+                }
+            );
 
+        const {
+            paymentId,
+            paymentUrl,
+        } = paymentResponse.data;
 
-    const telegramId =
-        ctx.from!.id;
+        if (paymentUrl) {
+            await renderMessage(
+                ctx,
+                "Оплатите подписку и затем нажмите «Проверить оплату»:",
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.url(
+                            "Оплатить",
+                            paymentUrl
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            "Проверить оплату",
+                            `check_payment:${paymentId}`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            "⬅️ Назад",
+                            "extend_subscription"
+                        ),
+                    ],
+                ])
+            );
 
+            return;
+        }
 
-    // пока временно получаем пользователя
-    const userResponse =
-        await backendApi.post(
-            "/api/users/telegram",
-            {
-                telegramId:
-                    String(telegramId),
-
-                username:
-                    ctx.from?.username ?? null,
-
-                firstName:
-                    ctx.from?.first_name ?? null,
-            }
+        await renderMessage(
+            ctx,
+            "Тестовый платёж создан. Нажмите кнопку для подтверждения:",
+            Markup.inlineKeyboard([
+                [
+                    Markup.button.callback(
+                        "Проверить оплату",
+                        `check_payment:${paymentId}`
+                    ),
+                ],
+                [
+                    Markup.button.callback(
+                        "⬅️ Назад",
+                        "extend_subscription"
+                    ),
+                ],
+            ])
+        );
+    } catch (error) {
+        console.error(
+            "Create payment error:",
+            error
         );
 
-
-    const orderResponse =
-        await backendApi.post(
-            "/api/orders/create",
-            {
-                userId:
-                userResponse.data.id,
-
-                planId
-            }
+        await renderMessage(
+            ctx,
+            [
+                "Не удалось создать счёт.",
+                "",
+                "Попробуйте выбрать способ оплаты ещё раз.",
+            ].join("\n"),
+            Markup.inlineKeyboard([
+                [
+                    Markup.button.callback(
+                        "⬅️ Назад",
+                        "extend_subscription"
+                    ),
+                ],
+            ])
         );
-
-
-    const {
-        orderId,
-        paymentId,
-        paymentUrl
-    } = orderResponse.data;
-
-
-    await ctx.reply(
-        [
-            "💳 Заказ создан",
-            "",
-            "Нажмите кнопку ниже для оплаты.",
-            "После оплаты нажмите «Проверить оплату»."
-        ].join("\n"),
-
-        Markup.inlineKeyboard([
-            [
-                Markup.button.url(
-                    "💳 Оплатить",
-                    paymentUrl
-                )
-            ],
-            [
-                Markup.button.callback(
-                    "🔄 Проверить оплату",
-                    `check_payment_${paymentId}`
-                )
-            ]
-        ])
-    );
+    }
 }

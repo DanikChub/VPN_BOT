@@ -1,28 +1,22 @@
-import {Router} from "express";
+import {
+    Router
+} from "express";
 
-import paymentController from "./payment.controller";
-import paymentWebhookController from "./payment.webhook.controller";
+import paymentController
+    from "./payment.controller";
 
 
-const paymentRouter = Router();
+const paymentRouter =
+    Router();
 
-
-// paymentRouter.post(
-//     "/fake-success",
-//     paymentController.fakeSuccess
-// );
 
 paymentRouter.post(
-    "/webhook/crypto",
-    paymentWebhookController.crypto
-);
-
-paymentRouter.get(
-    "/:paymentId/status",
-    paymentController.getStatus.bind(
+    "/create",
+    paymentController.create.bind(
         paymentController
     )
 );
+
 
 paymentRouter.post(
     "/:paymentId/check",
@@ -30,5 +24,6 @@ paymentRouter.post(
         paymentController
     )
 );
+
 
 export default paymentRouter;

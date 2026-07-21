@@ -5,6 +5,7 @@ import Order from "../modules/orders/order.model";
 import Plan from "../modules/plans/plan.model";
 import Payment from "../modules/payments/payment.model";
 import BalanceTransaction from "../modules/balances/balance-transaction.model";
+import PaymentMethod from "../modules/payments/payment-method.model";
 
 export const initAssociations = (): void => {
     User.hasOne(Subscription, {
@@ -63,5 +64,15 @@ export const initAssociations = (): void => {
     BalanceTransaction.belongsTo(User, {
         foreignKey: "user_id",
         as: "user",
+    });
+
+    Payment.belongsTo(PaymentMethod, {
+        foreignKey: "payment_method_id",
+        as: "payment_method",
+    });
+
+    PaymentMethod.hasMany(Payment, {
+        foreignKey: "payment_method_id",
+        as: "payments",
     });
 };

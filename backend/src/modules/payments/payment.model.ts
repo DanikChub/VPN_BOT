@@ -10,9 +10,10 @@ import sequelize from "../../database/sequelize";
 
 export type PaymentStatus =
     | "pending"
-    | "successful"
+    | "paid"
     | "failed"
-    | "cancelled";
+    | "cancelled"
+    | "expired";
 
 class Payment extends Model<
     InferAttributes<Payment>,
@@ -22,7 +23,15 @@ class Payment extends Model<
 
     declare order_id: number;
 
-    declare provider: string;
+    declare payment_method_id: number;
+
+    declare payment_url:
+        | string
+        | null;
+
+    declare expires_at:
+        | Date
+        | null;
 
     declare provider_payment_id:
         | string
@@ -50,14 +59,24 @@ Payment.init(
             allowNull: false,
         },
 
-        provider: {
-            type: DataTypes.STRING,
-            allowNull: false,
+        payment_method_id: {
+            type: DataTypes.INTEGER,
+                allowNull: false,
         },
 
         provider_payment_id: {
             type: DataTypes.STRING,
-            allowNull: true,
+                allowNull: true,
+        },
+
+        payment_url: {
+            type: DataTypes.TEXT,
+                allowNull: true,
+        },
+
+        expires_at: {
+            type: DataTypes.DATE,
+                allowNull: true,
         },
 
         amount: {

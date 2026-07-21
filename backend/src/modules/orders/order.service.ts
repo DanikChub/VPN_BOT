@@ -23,6 +23,9 @@ class OrderService {
             user_id: userId,
             plan_id: plan.id,
 
+            plan_name: plan.name,
+            duration_days: plan.duration_days,
+
             amount: plan.price_amount,
             currency: plan.currency,
 
