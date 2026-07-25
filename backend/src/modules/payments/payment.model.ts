@@ -92,9 +92,10 @@ Payment.init(
         status: {
             type: DataTypes.ENUM(
                 "pending",
-                "successful",
+                "paid",
                 "failed",
-                "cancelled"
+                "cancelled",
+                "expired"
             ),
             allowNull: false,
             defaultValue: "pending",
