@@ -174,19 +174,42 @@ export class AgentWebSocketServer {
             remoteAddress,
         );
 
+        /*
+         * Сообщения одного WebSocket-соединения должны
+         * обрабатываться строго последовательно.
+         *
+         * Иначе heartbeat может обработаться раньше,
+         * чем асинхронный HelloHandler завершит авторизацию.
+         */
+        let messageQueue: Promise<void> =
+            Promise.resolve();
+
         socket.on(
             "message",
             (
                 data,
                 isBinary,
             ) => {
-                void this.handleRawMessage({
-                    socket,
-                    request,
-                    remoteAddress,
-                    data,
-                    isBinary,
-                });
+                messageQueue =
+                    messageQueue
+                        .then(
+                            () =>
+                                this.handleRawMessage({
+                                    socket,
+                                    request,
+                                    remoteAddress,
+                                    data,
+                                    isBinary,
+                                }),
+                        )
+                        .catch(
+                            (error: unknown) => {
+                                console.error(
+                                    `Failed to process queued agent message: address=${remoteAddress}`,
+                                    error,
+                                );
+                            },
+                        );
             },
         );
 
@@ -280,9 +303,19 @@ export class AgentWebSocketServer {
             socket,
             request,
             remoteAddress,
-            message:
-            parsedValue,
+            message: parsedValue,
         });
+
+        const authenticatedAgent =
+            this.nodeRegistry.findBySocket(
+                socket,
+            );
+
+        if (authenticatedAgent) {
+            this.markAuthenticated(
+                socket,
+            );
+        }
     }
 
     private handleSocketClose(

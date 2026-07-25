@@ -209,9 +209,24 @@ export class NodeRegistry {
             return false;
         }
 
-        agent.socket.send(
-            JSON.stringify(message),
-        );
+        try {
+            agent.socket.send(
+                JSON.stringify(message),
+            );
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                `Failed to send message to node ${nodeId}`,
+                error,
+            );
+
+            this.unregister(nodeId);
+
+            return false;
+        }
 
         return true;
     }
