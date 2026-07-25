@@ -1,17 +1,17 @@
+import {
+    Outlet,
+} from "react-router-dom";
 
-import AppRouter from "@/app/router/AppRouter.tsx";
-import Sidebar from "@/widgets/sidebar/ui/Sidebar.tsx";
-
+import Sidebar from "@/widgets/sidebar/ui/Sidebar";
 
 const AppLayout = () => {
     return (
-        <div className="flex min-h-screen">
-            <Sidebar/>
+        <div className="min-h-screen bg-slate-100">
+            <Sidebar />
 
-            <main className="min-w-0 flex-1">
-                <AppRouter/>
+            <main className="min-h-screen pl-64">
+                <Outlet/>
             </main>
-
         </div>
     );
 };

@@ -23,6 +23,9 @@ class Subscription extends Model<
     >;
 
     declare expires_at: Date;
+
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
 }
 
 Subscription.init(
@@ -47,10 +50,24 @@ Subscription.init(
             type: DataTypes.DATE,
             allowNull: false,
         },
+
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            field: "created_at",
+        },
+
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            field: "updated_at",
+        },
     },
     {
         sequelize,
         tableName: "subscriptions",
+        modelName: "Subscription",
+        timestamps: true,
         underscored: true,
     }
 );

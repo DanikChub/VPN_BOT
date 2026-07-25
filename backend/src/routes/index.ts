@@ -9,6 +9,7 @@ import balanceRouter from "../modules/balances/balance.router";
 import subscriptionRouter from "../modules/subscriptions/subscription.router";
 import planRouter from "../modules/plans/plan.router";
 import paymentMethodsRouter from "../modules/payments/payment-method.router";
+import adminRouter from "../modules/admins/admin.router";
 
 
 
@@ -22,6 +23,8 @@ router.use("/balances", balanceRouter);
 router.use("/subscription", subscriptionRouter);
 router.use("/plans", planRouter);
 router.use("/payment-methods", paymentMethodsRouter);
+
+router.use("/admin", adminRouter);
 
 export default router;
 

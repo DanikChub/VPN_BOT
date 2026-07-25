@@ -25,12 +25,6 @@ class UserService {
             }
         });
 
-        if (created) {
-            await balanceService.addWelcomeBonus(
-                user.id
-            );
-
-        }
 
         return user;
     }

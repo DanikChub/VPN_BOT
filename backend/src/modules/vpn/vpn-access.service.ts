@@ -1,7 +1,7 @@
 import VpnCredential from "./vpn-credential.model";
 import VpnNode from "../vpn-nodes/vpn-node.model";
 
-import nodeControlService from "../../infrastructure/node-control/ssh-xray-node-control.service";
+import nodeControlService from "../../infrastructure/node-control-old/ssh-xray-node-control.service";
 
 class VpnAccessService {
     async grant(

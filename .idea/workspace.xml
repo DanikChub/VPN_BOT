@@ -4,7 +4,425 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e9b5ebd4-8010-46e5-a8aa-cd33c5b9a406" name="Changes" comment="Changes" />
+    <list default="true" id="e9b5ebd4-8010-46e5-a8aa-cd33c5b9a406" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/.idea/feature-sliced-design/general.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/handlers/command-result.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/handlers/heartbeat.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/handlers/hello.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/registry/node-registry.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/router/message-router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/services/command.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/types/connected-agent.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control/websocket/agent-websocket.server.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/installers/agent.installer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/installers/xray.installer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/services/node-provisioning.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/ssh/scp.client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/ssh/ssh.client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-provisioning/types/provisioning.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/admin-permissions.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/admin.model.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/admin.router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/auth/admin-auth.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/auth/admin-auth.router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/auth/admin-auth.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/auth/admin-auth.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/middleware/authenticate-admin.middleware.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/middleware/require-permission.middleware.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/nodes/admin-nodes.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/nodes/admin-nodes.router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/nodes/admin-nodes.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/nodes/admin-nodes.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/payments/admin-payments.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/payments/admin-payments.router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/payments/admin-payments.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/users/admin-users.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/users/admin-users.router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/users/admin-users.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/admins/users/admin-users.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/vpn-nodes/vpn-node-provisioning.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/modules/vpn-nodes/vpn-node.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/scripts/create-superadmin.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/types/express.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/storage/releases/vpn-node-agent.tar.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/app/providers/AppProviders.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/app/router/RequireAuth.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/admin/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/admin/model/admin.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/api/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/api/user.api.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/model/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/model/user.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/ui/UserSubscriptionBadge.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/ui/UserTable.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/user/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/api/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/api/vpn-node.api.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/model/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/model/vpn-node.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/ui/VpnNodeStatusBadge.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/entities/vpn-node/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/api/authApi.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/model/AuthContext.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/model/AuthProvider.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/model/auth.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/model/useAuth.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/auth/ui/LoginForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/filter-users/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/filter-users/ui/UsersFilters.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/paginate-users/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/features/paginate-users/ui/UsersPagination.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/login/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/login/ui/LoginPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/nodes/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/nodes/ui/NodesPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/api/api.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/api/apiClient.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/api/getApiErrorMessage.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/api/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/config/env.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/config/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/lib/cn.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/lib/formatDate.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/lib/formatMoney.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/lib/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/lib/tokenStorage.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Badge/Badge.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Badge/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Button/Button.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Button/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Card/Card.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Card/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/ConfirmDialog/ConfirmDialog.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/ConfirmDialog/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Empty/EmptyState.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Empty/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Input/Input.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Input/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Modal/Modal.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Modal/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Page/Page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Page/PageHeader.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Page/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Spinner/Spinner.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Spinner/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Table/Table.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/Table/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/shared/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/vite-env.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/model/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/model/useNodesList.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/ui/CreateVpnNodeDialog.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/ui/NodesList.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/ui/NodesListContent.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/ui/NodesTable.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/nodes/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/sidebar/config/sidebarLinks.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/model/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/model/useUsersList.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/ui/UsersList.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/ui/UsersListContent.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/widgets/users-list/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/index.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/command-result.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/command-result.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/command.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/command.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/error-message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/error-message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/heartbeat.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/heartbeat.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/hello.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/hello.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/message-type.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/message-type.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/cjs/protocol/message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/index.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/index.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/index.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command-result.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command-result.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command-result.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command-result.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/command.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/error-message.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/error-message.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/error-message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/error-message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/heartbeat.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/heartbeat.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/heartbeat.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/heartbeat.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/hello.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/hello.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/hello.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/hello.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message-type.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message-type.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message-type.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message-type.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/esm/protocol/message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/index.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/index.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/index.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command-result.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command-result.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command-result.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command-result.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/command.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/error-message.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/error-message.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/error-message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/error-message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/heartbeat.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/heartbeat.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/heartbeat.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/heartbeat.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/hello.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/hello.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/hello.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/hello.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message-type.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message-type.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message-type.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message-type.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/dist/protocol/message.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsc.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsc.ps1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsserver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsserver.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.bin/tsserver.ps1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/.package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/LICENSE.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/SECURITY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/ThirdPartyNoticeText.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/bin/tsc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/bin/tsserver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/_tsc.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/_tsserver.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/_typingsInstaller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/cs/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/de/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/es/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/fr/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/it/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/ja/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/ko/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.decorators.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.decorators.legacy.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.dom.asynciterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.dom.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.dom.iterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.collection.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.core.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.generator.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.iterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.proxy.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.reflect.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.symbol.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2016.array.include.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2016.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2016.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2016.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.date.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.object.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2018.regexp.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.array.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.object.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2019.symbol.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.bigint.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.date.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.number.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2021.weakref.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.array.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.error.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.object.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.regexp.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2022.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2023.array.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2023.collection.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2023.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2023.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2023.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.arraybuffer.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.collection.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.object.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.regexp.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.sharedmemory.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es2024.string.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es5.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.es6.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.array.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.collection.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.decorators.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.disposable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.error.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.float16.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.full.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.intl.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.iterator.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.promise.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.esnext.sharedmemory.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.scripthost.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.webworker.asynciterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.webworker.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.webworker.importscripts.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/lib.webworker.iterable.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/pl/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/pt-br/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/ru/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/tr/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/tsc.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/tsserver.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/tsserverlibrary.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/tsserverlibrary.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/typesMap.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/typescript.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/typescript.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/typingsInstaller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/watchGuard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/zh-cn/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/lib/zh-tw/diagnosticMessages.generated.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/node_modules/typescript/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/scripts/write-cjs-package.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/command-result.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/command.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/error-message.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/heartbeat.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/hello.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/message-type.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/src/protocol/message.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/tsconfig.base.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/tsconfig.cjs.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_common/tsconfig.esm.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/scripts/install.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/scripts/uninstall.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/app.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/commands/command-router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/commands/command.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/commands/handlers/add-user.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/commands/handlers/get-status.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/commands/handlers/remove-user.handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/config/config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/connection/agent-connection.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/health/health.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/health/health.types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/heartbeat/heartbeat.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/logger/logger.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/system/system-info.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/src/xray/xray.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/systemd/vpn-node-agent.service" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vpn_node_agent/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/infrastructure/node-control/node-control.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control-old/node-control.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/infrastructure/node-control/ssh-xray-node-control.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/infrastructure/node-control-old/ssh-xray-node-control.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/modules/subscriptions/subscription.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/modules/subscriptions/subscription.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/modules/test/test.router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/modules/test/test.router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/modules/users/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/modules/users/user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/modules/vpn-nodes/vpn-node.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/modules/vpn-nodes/vpn-node.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/modules/vpn/vpn-access.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/modules/vpn/vpn-access.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/layouts/AppLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/layouts/AppLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/router/AppRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/router/AppRouter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/router/routes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/router/routes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/users/ui/UsersPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/users/ui/UsersPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/shared/config/routePaths.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/shared/config/routePaths.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/shared/config/sidebarLinks.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/widgets/sidebar/ui/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/widgets/sidebar/ui/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bot.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test-xray.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vpn.service.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/xray.service.js" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,31 +455,38 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="3GgcD0hFrZel7n3mAU8mMmHI8yB" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kronk.content.tree.expanded.paths&quot;: &quot;&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.1.5\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "kronk.content.tree.expanded.paths": "",
+    "last_opened_file_path": "D:/for works/sites_projects/Собственные сервисы/VPN_BOT/frontend/src/widgets/nodes/ui",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2024.1.5\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\widgets\nodes\ui" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\app\router" />
-      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\shared\config" />
-      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\shared" />
-      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\app" />
-      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\app\styles" />
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\backend\storage\releases" />
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\backend\src\infrastructure\node-control\websocket" />
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\widgets\sidebar\config" />
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\frontend\src\app\providers" />
+      <recent name="D:\for works\sites_projects\Собственные сервисы\VPN_BOT\backend\src\modules\admins\auth" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -82,6 +507,8 @@
       <workItem from="1784396529817" duration="2231000" />
       <workItem from="1784398816439" duration="256000" />
       <workItem from="1784399104260" duration="30956000" />
+      <workItem from="1784605067420" duration="1257000" />
+      <workItem from="1784797359499" duration="36958000" />
     </task>
     <servers />
   </component>

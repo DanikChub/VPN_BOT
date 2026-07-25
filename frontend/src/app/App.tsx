@@ -1,12 +1,15 @@
 import {BrowserRouter} from "react-router-dom";
-import AppLayout from "@/app/layouts/AppLayout.tsx";
+import {AppProviders} from "@/app/providers/AppProviders.tsx";
+import AppRouter from "@/app/router/AppRouter.tsx";
 
 
 const App = () => {
     return (
-        <BrowserRouter>
-            <AppLayout/>
-        </BrowserRouter>
+        <AppProviders>
+            <BrowserRouter>
+                <AppRouter/>
+            </BrowserRouter>
+        </AppProviders>
     );
 };
 

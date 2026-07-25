@@ -22,9 +22,33 @@ class VpnNode extends Model<
     declare reality_server_name: string;
     declare reality_short_id: string;
 
-    declare inbound_tag: string;
+    declare inbound_tag: CreationOptional<string>;
 
     declare is_active: CreationOptional<boolean>;
+
+    declare status: CreationOptional<
+        "online" | "offline"
+    >;
+
+    declare last_seen_at: Date | null;
+
+    declare cpu_count: number | null;
+    declare cpu_model: string | null;
+
+    declare memory_total: number | null;
+    declare memory_used: number | null;
+
+    declare uptime_seconds: number | null;
+
+    declare install_status: CreationOptional<
+        "pending"
+        | "installing"
+        | "waiting_agent"
+        | "ready"
+        | "failed"
+    >;
+
+    declare agent_token: string | null;
 
     declare ssh_port: CreationOptional<number>;
     declare ssh_user: CreationOptional<string>;
@@ -80,6 +104,63 @@ VpnNode.init(
             allowNull: false,
             defaultValue: true,
         },
+
+        status: {
+            type: DataTypes.ENUM(
+                "online",
+                "offline",
+            ),
+            allowNull: false,
+            defaultValue: "offline",
+        },
+
+        last_seen_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        cpu_count: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+
+        cpu_model: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
+        memory_total: {
+            type: DataTypes.BIGINT,
+            allowNull: true,
+        },
+
+        memory_used: {
+            type: DataTypes.BIGINT,
+            allowNull: true,
+        },
+
+        uptime_seconds: {
+            type: DataTypes.BIGINT,
+            allowNull: true,
+        },
+
+        install_status: {
+            type: DataTypes.ENUM(
+                "pending",
+                "installing",
+                "waiting_agent",
+                "ready",
+                "failed",
+            ),
+            allowNull: false,
+            defaultValue: "pending",
+        },
+
+        agent_token: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
         ssh_port: {
             type: DataTypes.INTEGER,
             allowNull: false,

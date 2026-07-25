@@ -1,16 +1,40 @@
-import {MAIN_ROUTE, USERS_ROUTE} from "@/shared/config/routePaths.ts";
+import type {
+    ReactNode,
+} from "react";
+
 import MainPage from "@/pages/main";
 import UsersPage from "@/pages/users";
+import LoginPage from "@/pages/login";
+import NodesPage from "@/pages/nodes";
+
+import {
+    routePaths,
+} from "@/shared/config/routePaths";
 
 
+export interface AppRoute {
+    path: string;
+    element: ReactNode;
+}
 
-export const routes = [
+export const publicRoutes: AppRoute[] = [
     {
-        path: MAIN_ROUTE,
-        element: <MainPage/>
+        path: routePaths.login,
+        element: <LoginPage />,
+    },
+];
+
+export const protectedRoutes: AppRoute[] = [
+    {
+        path: routePaths.main,
+        element: <MainPage />,
     },
     {
-        path: USERS_ROUTE,
-        element: <UsersPage/>
-    }
-]
+        path: routePaths.users,
+        element: <UsersPage />,
+    },
+    {
+        path: routePaths.nodes,
+        element: <NodesPage />,
+    },
+];
