@@ -1,5 +1,5 @@
-import VpnCredential from "../../modules/vpn/vpn-credential.model";
-import VpnNode from "../../modules/vpn-nodes/vpn-node.model";
+import VpnCredential from "../../../modules/vpn/vpn-credential.model";
+import VpnNode from "../../../modules/vpn-nodes/vpn-node.model";
 
 export interface NodeControlService {
     addUser(

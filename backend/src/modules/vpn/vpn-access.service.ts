@@ -1,102 +1,146 @@
 import VpnCredential from "./vpn-credential.model";
 import VpnNode from "../vpn-nodes/vpn-node.model";
+import {NodeControlService} from "../../infrastructure/node-control/services/node-control.service";
 
-import nodeControlService from "../../infrastructure/node-control-old/ssh-xray-node-control.service";
 
-class VpnAccessService {
-    async grant(
-        credential: VpnCredential
+
+export class VpnAccessService {
+    public constructor(
+        private readonly nodeControlService:
+        NodeControlService,
+    ) {}
+
+    public async grant(
+        credential: VpnCredential,
     ): Promise<void> {
-        const nodes = await VpnNode.findAll({
-            where: {
-                is_active: true,
-            },
-        });
+        const nodes =
+            await VpnNode.findAll({
+                where: {
+                    is_active:
+                        true,
+                },
+            });
 
-        const results = await Promise.allSettled(
-            nodes.map((node) =>
-                nodeControlService.addUser(
-                    node,
-                    credential
-                )
-            )
-        );
-
-        const failedNodes = results
-            .map((result, index) => ({
-                result,
-                node: nodes[index],
-            }))
-            .filter(
-                ({ result }) =>
-                    result.status === "rejected"
+        const results =
+            await Promise.allSettled(
+                nodes.map(
+                    (node) =>
+                        this.nodeControlService.addUser(
+                            node,
+                            credential,
+                        ),
+                ),
             );
 
-        if (failedNodes.length > 0) {
-            for (const {
+        const failedNodes =
+            results
+                .map(
+                    (
+                        result,
+                        index,
+                    ) => ({
+                        result,
+                        node:
+                            nodes[index],
+                    }),
+                )
+                .filter(
+                    ({ result }) =>
+                        result.status ===
+                        "rejected",
+                );
+
+        if (
+            failedNodes.length ===
+            0
+        ) {
+            return;
+        }
+
+        for (
+            const {
                 result,
                 node,
-            } of failedNodes) {
-                console.error(
-                    `[VPN] Failed to grant access on node ${node.name}`,
-                    result.status === "rejected"
-                        ? result.reason
-                        : undefined
-                );
-            }
-
-            throw new Error(
-                `Failed to grant VPN access on ${failedNodes.length} node(s)`
+            } of failedNodes
+            ) {
+            console.error(
+                `[VPN] Failed to grant access on node ${node.name}`,
+                result.status ===
+                "rejected"
+                    ? result.reason
+                    : undefined,
             );
         }
+
+        throw new Error(
+            `Failed to grant VPN access on ${failedNodes.length} node(s)`,
+        );
     }
 
-    async revoke(
-        credential: VpnCredential
+    public async revoke(
+        credential: VpnCredential,
     ): Promise<void> {
-        const nodes = await VpnNode.findAll({
-            where: {
-                is_active: true,
-            },
-        });
+        const nodes =
+            await VpnNode.findAll({
+                where: {
+                    is_active:
+                        true,
+                },
+            });
 
-        const results = await Promise.allSettled(
-            nodes.map((node) =>
-                nodeControlService.removeUser(
-                    node,
-                    credential
-                )
-            )
-        );
-
-        const failedNodes = results
-            .map((result, index) => ({
-                result,
-                node: nodes[index],
-            }))
-            .filter(
-                ({ result }) =>
-                    result.status === "rejected"
+        const results =
+            await Promise.allSettled(
+                nodes.map(
+                    (node) =>
+                        this.nodeControlService.removeUser(
+                            node,
+                            credential,
+                        ),
+                ),
             );
 
-        if (failedNodes.length > 0) {
-            for (const {
+        const failedNodes =
+            results
+                .map(
+                    (
+                        result,
+                        index,
+                    ) => ({
+                        result,
+                        node:
+                            nodes[index],
+                    }),
+                )
+                .filter(
+                    ({ result }) =>
+                        result.status ===
+                        "rejected",
+                );
+
+        if (
+            failedNodes.length ===
+            0
+        ) {
+            return;
+        }
+
+        for (
+            const {
                 result,
                 node,
-            } of failedNodes) {
-                console.error(
-                    `[VPN] Failed to revoke access on node ${node.name}`,
-                    result.status === "rejected"
-                        ? result.reason
-                        : undefined
-                );
-            }
-
-            throw new Error(
-                `Failed to revoke VPN access on ${failedNodes.length} node(s)`
+            } of failedNodes
+            ) {
+            console.error(
+                `[VPN] Failed to revoke access on node ${node.name}`,
+                result.status ===
+                "rejected"
+                    ? result.reason
+                    : undefined,
             );
         }
+
+        throw new Error(
+            `Failed to revoke VPN access on ${failedNodes.length} node(s)`,
+        );
     }
 }
-
-export default new VpnAccessService();

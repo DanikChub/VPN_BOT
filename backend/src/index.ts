@@ -2,21 +2,37 @@ import "dotenv/config";
 
 import http from "node:http";
 
+import {
+    MessageType,
+    type HelloMessage,
+    type HeartbeatMessage,
+    type CommandResultMessage,
+} from "@vpn/common";
+
 import app from "./app";
 import { initDatabase } from "./database";
 import { startJobs } from "./jobs";
 
-import { NodeRegistry } from "./infrastructure/node-control/registry/node-registry";
-import { AgentWebSocketServer } from "./infrastructure/node-control/websocket/agent-websocket.server";
 import {
-    MessageType,
-    type HelloMessage,
-} from "@vpn/common";
+    nodeRegistry,
+    commandService,
+} from "./infrastructure/container";
+import {
+    AgentWebSocketServer,
+} from "./infrastructure/node-control/websocket/agent-websocket.server";
 
-import { HelloHandler } from "./infrastructure/node-control/handlers/hello.handler";
-import { HeartbeatHandler } from "./infrastructure/node-control/handlers/heartbeat.handler";
-import {CommandService} from "./infrastructure/node-control/services/command.service";
-import {CommandResultHandler} from "./infrastructure/node-control/handlers/command-result.handler";
+import {
+    HelloHandler,
+} from "./infrastructure/node-control/handlers/hello.handler";
+
+import {
+    HeartbeatHandler,
+} from "./infrastructure/node-control/handlers/heartbeat.handler";
+
+import {
+    CommandResultHandler,
+} from "./infrastructure/node-control/handlers/command-result.handler";
+
 
 import createTestRouter from "./modules/test/test.router";
 
@@ -31,59 +47,29 @@ const start = async (): Promise<void> => {
         startJobs();
 
         const httpServer =
-            http.createServer(app);
+            http.createServer(
+                app,
+            );
 
-        const nodeRegistry =
-            new NodeRegistry();
 
         const agentWebSocketServer =
             new AgentWebSocketServer({
                 httpServer,
                 nodeRegistry,
                 path: "/ws/agent",
-
-
             });
 
-        const nodeAgentToken =
-            process.env.NODE_AGENT_TOKEN;
-
-        if (!nodeAgentToken) {
-            throw new Error(
-                "NODE_AGENT_TOKEN is not configured",
-            );
-        }
 
         const helloHandler =
-            new HelloHandler({
+            new HelloHandler(
                 nodeRegistry,
-
-                expectedToken:
-                nodeAgentToken,
-
-                heartbeatIntervalMs:
-                    10_000,
-
-                markAuthenticated:
-                    (socket) => {
-                        agentWebSocketServer
-                            .markAuthenticated(
-                                socket,
-                            );
-                    },
-            });
+                commandService,
+            );
 
         const heartbeatHandler =
             new HeartbeatHandler({
                 nodeRegistry,
             });
-
-        const commandService =
-            new CommandService({
-                nodeRegistry,
-            });
-
-
 
         const commandResultHandler =
             new CommandResultHandler({
@@ -91,29 +77,29 @@ const start = async (): Promise<void> => {
                 commandService,
             });
 
+        const messageRouter =
+            agentWebSocketServer.getRouter();
+
+        messageRouter.register<HelloMessage>(
+            MessageType.HELLO,
+            helloHandler.handle,
+        );
+
+        messageRouter.register<HeartbeatMessage>(
+            MessageType.HEARTBEAT,
+            heartbeatHandler.handle,
+        );
+
+        messageRouter.register<CommandResultMessage>(
+            MessageType.COMMAND_RESULT,
+            commandResultHandler.handle,
+        );
+
         app.use(
             "/api/test",
             createTestRouter(
                 commandService,
             ),
-        );
-
-        const router =
-            agentWebSocketServer.getRouter();
-
-        router.register<HelloMessage>(
-            MessageType.HELLO,
-            helloHandler.handle,
-        );
-
-        router.register(
-            MessageType.HEARTBEAT,
-            heartbeatHandler.handle,
-        );
-
-        router.register(
-            MessageType.COMMAND_RESULT,
-            commandResultHandler.handle,
         );
 
         httpServer.listen(
@@ -125,6 +111,11 @@ const start = async (): Promise<void> => {
 
                 console.log(
                     `Agent WebSocket endpoint: ws://localhost:${PORT}/ws/agent`,
+                );
+
+                console.log(
+                    "Registered agent message types:",
+                    messageRouter.getRegisteredMessageTypes(),
                 );
             },
         );

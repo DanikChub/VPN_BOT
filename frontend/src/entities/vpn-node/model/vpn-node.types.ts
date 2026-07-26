@@ -32,17 +32,10 @@ export interface CreateVpnNodeDto {
 
     port:number;
 
-
     sshPort:number;
 
     sshUser:string;
 
     sshPassword:string;
 
-
-    realityPublicKey:string;
-
-    realityServerName:string;
-
-    realityShortId:string;
 }

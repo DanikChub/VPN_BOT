@@ -8,7 +8,6 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "create-superadmin": "tsx src/scripts/create-superadmin.ts",
-
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
     "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
@@ -40,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.1.1",
     "@types/ssh2": "^1.15.5",
+    "@types/ssh2-sftp-client": "^9.0.6",
     "@types/ws": "^8.18.1",
     "nodemon": "^3.1.14",
     "sequelize-cli": "^6.6.5",

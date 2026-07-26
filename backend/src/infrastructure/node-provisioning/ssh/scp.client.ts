@@ -1,4 +1,4 @@
-import Client from "ssh2-sftp-client";
+import SftpClient from "ssh2-sftp-client";
 
 
 interface ScpOptions {
@@ -28,7 +28,7 @@ export class ScpClient {
     ): Promise<void> {
 
         const client =
-            new Client();
+            new SftpClient();
 
 
         try {

@@ -10,7 +10,7 @@ import {
     PageHeader,
 } from "@/shared/ui";
 import CreateVpnNodeModal from "@/widgets/nodes/ui/CreateVpnNodeDialog.tsx";
-import {useRef, useState} from "react";
+import {useRef} from "react";
 
 
 const NodesPage = () => {

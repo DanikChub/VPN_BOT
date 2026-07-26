@@ -7,9 +7,8 @@ import Subscription
 
 import vpnCredentialService
     from "../vpn/vpn-credential.service";
+import {vpnAccessService} from "../../infrastructure/container";
 
-import vpnAccessService
-    from "../vpn/vpn-access.service";
 
 interface SubscriptionDetails {
     id: number;
@@ -192,15 +191,51 @@ class SubscriptionService {
 
         const grantAccess =
             async (): Promise<void> => {
+                console.log(
+                    "[VPN] Starting access grant",
+                    {
+                        userId,
+                        credentialId:
+                        credential.id,
+                        uuid:
+                        credential.uuid,
+                    }
+                );
 
                 try {
                     await vpnAccessService.grant(
                         credential
                     );
+
+                    console.log(
+                        "[VPN] Access granted successfully",
+                        {
+                            userId,
+                            uuid:
+                            credential.uuid,
+                        }
+                    );
                 } catch (error) {
                     console.error(
-                        `[VPN] Failed to grant access for user ${userId}:`,
-                        error
+                        "[VPN] Failed to grant access",
+                        {
+                            userId,
+                            credentialId:
+                            credential.id,
+                            uuid:
+                            credential.uuid,
+                            error:
+                                error instanceof Error
+                                    ? {
+                                        name:
+                                        error.name,
+                                        message:
+                                        error.message,
+                                        stack:
+                                        error.stack,
+                                    }
+                                    : error,
+                        }
                     );
                 }
             };

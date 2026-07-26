@@ -75,7 +75,7 @@ export class SSHClient {
 
                                     stream.on(
                                         "data",
-                                        (data) => {
+                                        (data: Buffer) => {
 
                                             output += data.toString();
 

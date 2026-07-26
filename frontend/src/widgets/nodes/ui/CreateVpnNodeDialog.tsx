@@ -30,11 +30,8 @@ const initialForm: CreateVpnNodeDto = {
 
     sshUser: "root",
 
-    realityPublicKey: "",
+    sshPassword: "",
 
-    realityServerName: "",
-
-    realityShortId: "",
 };
 
 
@@ -210,56 +207,18 @@ const CreateVpnNodeModal = ({
                         }
                     />
 
-
-
                     <Input
-                        label="Reality Public Key"
-
-                        value={
-                            form.realityPublicKey
-                        }
-
+                        label="SSH пароль"
+                        type="password"
+                        value={form.sshPassword}
                         onChange={(event) =>
                             updateField(
-                                "realityPublicKey",
+                                "sshPassword",
                                 event.target.value,
                             )
                         }
                     />
 
-
-
-                    <Input
-                        label="Reality Server Name"
-
-                        value={
-                            form.realityServerName
-                        }
-
-                        onChange={(event) =>
-                            updateField(
-                                "realityServerName",
-                                event.target.value,
-                            )
-                        }
-                    />
-
-
-
-                    <Input
-                        label="Reality Short ID"
-
-                        value={
-                            form.realityShortId
-                        }
-
-                        onChange={(event) =>
-                            updateField(
-                                "realityShortId",
-                                event.target.value,
-                            )
-                        }
-                    />
 
 
                 </div>

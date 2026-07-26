@@ -14,3 +14,23 @@ export type CommandResultMessage = ProtocolMessage<
     MessageType.COMMAND_RESULT,
     CommandResultPayload
 >;
+
+export interface AddUsersCommandResult {
+    inboundTag: string;
+
+    addedEmails: string[];
+
+    existingEmails: string[];
+
+    totalUsers: number;
+}
+
+export interface RemoveUsersCommandResult {
+    inboundTag: string;
+
+    removedEmails: string[];
+
+    missingEmails: string[];
+
+    totalUsers: number;
+}

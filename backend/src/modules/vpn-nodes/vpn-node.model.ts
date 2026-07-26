@@ -176,7 +176,7 @@ VpnNode.init(
     {
         sequelize,
         tableName: "vpn_nodes",
-        underscored: true,
+        timestamps: false,
     }
 );
 

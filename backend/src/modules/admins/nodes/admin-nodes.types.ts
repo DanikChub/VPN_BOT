@@ -64,24 +64,11 @@ export function mapNodeToAdminResponse(
 }
 
 export interface CreateNodeDto {
+    name: string;
+    host: string;
+    port: number;
 
-    name:string;
-
-    host:string;
-
-    port:number;
-
-
-    sshPort:number;
-
-    sshUser:string;
-
-    sshPassword:string;
-
-
-    realityPublicKey:string;
-
-    realityServerName:string;
-
-    realityShortId:string;
+    sshPort: number;
+    sshUser: string;
+    sshPassword: string;
 }

@@ -339,6 +339,26 @@ export class AgentConnection {
     private async handleCommand(
         message: unknown,
     ): Promise<void> {
+        const commandMessage =
+            message as {
+                requestId?: string;
+                payload?: {
+                    command?: string;
+                    arguments?: unknown;
+                };
+            };
+
+        this.logger.info(
+            "Command received",
+            {
+                requestId:
+                commandMessage.requestId,
+                command:
+                commandMessage.payload?.command,
+                arguments:
+                commandMessage.payload?.arguments,
+            },
+        );
 
         if (!this.commandRouter) {
             this.logger.error(
@@ -348,20 +368,24 @@ export class AgentConnection {
             return;
         }
 
-
         const result =
             await this.commandRouter.handle(
                 message,
             );
 
+        this.logger.info(
+            "Command execution completed",
+            {
+                requestId:
+                commandMessage.requestId,
+                command:
+                commandMessage.payload?.command,
+                result,
+            },
+        );
 
         const requestId =
-            (
-                message as {
-                    requestId?: string;
-                }
-            ).requestId;
-
+            commandMessage.requestId;
 
         const payload =
             result !== null &&
@@ -372,28 +396,23 @@ export class AgentConnection {
                     success: false,
                     error: {
                         code: "COMMAND_ERROR",
-                        message: "Invalid command result",
+                        message:
+                            "Invalid command result",
                     },
                 };
-
 
         const response: CommandResultMessage = {
             type:
             MessageType.COMMAND_RESULT,
-
             payload,
         };
-
 
         if (requestId) {
             response.requestId =
                 requestId;
         }
 
-
-        this.send(
-            response,
-        );
+        this.send(response);
     }
 
     private sendHello(): void {

@@ -40,7 +40,7 @@ export default function useNodesList() {
 
 
         } catch (error: unknown) {
-
+            console.log(error)
             setErrorMessage(
                 getApiErrorMessage(error)
             );

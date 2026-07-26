@@ -1,4 +1,4 @@
-import vpnNodeService from "../../vpn-nodes/vpn-node.service";
+import VpnNode from "../../vpn-nodes/vpn-node.model";
 
 import {
     mapNodeToAdminResponse,
@@ -7,16 +7,16 @@ import {
 import type {
     CreateNodeDto,
 } from "./admin-nodes.types";
+import nodeProvisioningService from "../../../infrastructure/node-provisioning/services/node-provisioning.service";
+
+
 
 
 class AdminNodesService {
-
-
     async getAll() {
-
-        const nodes =
-            await vpnNodeService.getAll();
-
+        const nodes = await VpnNode.findAll({
+            order: [["id", "ASC"]],
+        });
 
         return nodes.map(
             mapNodeToAdminResponse,
@@ -24,68 +24,60 @@ class AdminNodesService {
     }
 
 
-
     async getById(
         nodeId: number,
     ) {
-
-        const node =
-            await vpnNodeService.getById(
-                nodeId,
-            );
-
+        const node = await VpnNode.findByPk(
+            nodeId,
+        );
 
         if (!node) {
             return null;
         }
 
-
         return mapNodeToAdminResponse(
             node,
         );
     }
+
 
     async create(
         dto: CreateNodeDto,
     ) {
+        const node = await VpnNode.create({
+            name: dto.name,
+            host: dto.host,
+            port: dto.port,
 
-        const node =
-            await vpnNodeService.create({
+            ssh_port: dto.sshPort,
+            ssh_user: dto.sshUser,
 
-                name:
-                dto.name,
+            inbound_tag:
+                "vless-reality-in",
 
-                host:
-                dto.host,
+            is_active: true,
+            status: "offline",
+            install_status: "pending",
 
-                port:
-                dto.port,
+            reality_public_key: "",
+            reality_server_name: "",
+            reality_short_id: "",
+        });
 
+        await nodeProvisioningService.install(
+            node.id,
+            {
+                sshPassword:
+                dto.sshPassword,
+            },
+        );
 
-                ssh_port:
-                dto.sshPort,
-
-                ssh_user:
-                dto.sshUser,
-
-
-                reality_public_key:
-                dto.realityPublicKey,
-
-                reality_server_name:
-                dto.realityServerName,
-
-                reality_short_id:
-                dto.realityShortId,
-
-            });
-
+        await node.reload();
 
         return mapNodeToAdminResponse(
             node,
         );
     }
-
 }
 
 

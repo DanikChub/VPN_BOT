@@ -1,22 +1,18 @@
 import crypto from "node:crypto";
 
 import {
-    Transaction
+    DatabaseError,
+    Transaction,
 } from "sequelize";
 
 import User from "../users/user.model";
-
-import VpnCredential
-    from "./vpn-credential.model";
-
+import VpnCredential from "./vpn-credential.model";
 
 class VpnCredentialService {
-
     async get(
         userId: number,
-        transaction?: Transaction
+        transaction?: Transaction,
     ): Promise<VpnCredential | null> {
-
         return VpnCredential.findOne({
             where: {
                 user_id: userId,
@@ -25,54 +21,80 @@ class VpnCredentialService {
         });
     }
 
-
     async getOrCreate(
         userId: number,
-        transaction?: Transaction
+        transaction?: Transaction,
     ): Promise<VpnCredential> {
-
         const user =
             await User.findByPk(
                 userId,
                 {
                     transaction,
-                }
+                },
             );
-
 
         if (!user) {
             throw new Error(
-                "User not found"
+                "User not found",
             );
         }
 
+        try {
+            const [credential] =
+                await VpnCredential.findOrCreate({
+                    where: {
+                        user_id:
+                        user.id,
+                    },
 
-        const [credential] =
-            await VpnCredential.findOrCreate({
-                where: {
-                    user_id: user.id,
-                },
+                    defaults: {
+                        user_id:
+                        user.id,
 
-                defaults: {
-                    user_id:
-                    user.id,
+                        uuid:
+                            crypto.randomUUID(),
 
-                    uuid:
-                        crypto.randomUUID(),
+                        subscription_token:
+                            crypto
+                                .randomBytes(32)
+                                .toString("hex"),
+                    },
 
-                    subscription_token:
-                        crypto
-                            .randomBytes(32)
-                            .toString("hex"),
-                },
+                    transaction,
+                });
 
-                transaction,
-            });
+            return credential;
+        } catch (error) {
+            console.error(
+                "[VPN CREDENTIAL] Failed:",
+                error,
+            );
+
+            if (
+                error instanceof
+                DatabaseError
+            ) {
+                console.error(
+                    "[VPN CREDENTIAL] PostgreSQL message:",
+                    error.parent.message,
+                );
 
 
-        return credential;
+
+                console.error(
+                    "[VPN CREDENTIAL] SQL:",
+                    error.sql,
+                );
+
+                console.error(
+                    "[VPN CREDENTIAL] Parameters:",
+                    error.parameters,
+                );
+            }
+
+            throw error;
+        }
     }
 }
-
 
 export default new VpnCredentialService();

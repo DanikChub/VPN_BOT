@@ -2,11 +2,14 @@ import { randomUUID } from "node:crypto";
 
 import {
     MessageType,
+    AgentCommandType,
     type CommandMessage,
-    type CommandResultMessage, AgentCommandType,
+    type CommandResultMessage,
 } from "@vpn/common";
 
-import type { NodeRegistry } from "../registry/node-registry";
+import type {
+    NodeRegistry,
+} from "../registry/node-registry";
 
 interface PendingCommand {
     resolve(
@@ -27,9 +30,11 @@ interface CommandServiceOptions {
 }
 
 export class CommandService {
-    private readonly nodeRegistry: NodeRegistry;
+    private readonly nodeRegistry:
+        NodeRegistry;
 
-    private readonly timeoutMs: number;
+    private readonly timeoutMs:
+        number;
 
     private readonly pending =
         new Map<
@@ -48,52 +53,55 @@ export class CommandService {
             30_000;
     }
 
-    public async sendCommand(
+    public sendCommand(
         nodeId: number,
         command: AgentCommandType,
         arguments_: unknown,
     ): Promise<CommandResultMessage> {
-        const requestId = randomUUID();
+        const requestId =
+            randomUUID();
 
         const message: CommandMessage = {
-            type: MessageType.COMMAND,
+            type:
+            MessageType.COMMAND,
+
             requestId,
+
             payload: {
                 command,
-                arguments: arguments_,
+                arguments:
+                arguments_,
             },
         };
 
-        const sent = this.nodeRegistry.send(
-            nodeId,
-            message,
-        );
+        return new Promise<CommandResultMessage>(
+            (
+                resolve,
+                reject,
+            ) => {
+                const timeout =
+                    setTimeout(
+                        () => {
+                            this.pending.delete(
+                                requestId,
+                            );
 
-        if (!sent) {
-            throw new Error(
-                `Node ${nodeId} is offline`,
-            );
-        }
-
-        return await new Promise<CommandResultMessage>(
-            (resolve, reject) => {
-                const timeout = setTimeout(
-                    () => {
-                        this.pending.delete(
-                            requestId,
-                        );
-
-                        reject(
-                            new Error(
-                                `Command "${command}" timed out for node ${nodeId}`,
-                            ),
-                        );
-                    },
-                    this.timeoutMs,
-                );
+                            reject(
+                                new Error(
+                                    `Command "${command}" timed out for node ${nodeId}`,
+                                ),
+                            );
+                        },
+                        this.timeoutMs,
+                    );
 
                 timeout.unref();
 
+                /*
+                 * Сначала регистрируем ожидание ответа.
+                 * Иначе быстрый command-result может прийти
+                 * раньше pending.set().
+                 */
                 this.pending.set(
                     requestId,
                     {
@@ -101,6 +109,30 @@ export class CommandService {
                         reject,
                         timeout,
                     },
+                );
+
+                const sent =
+                    this.nodeRegistry.send(
+                        nodeId,
+                        message,
+                    );
+
+                if (sent) {
+                    return;
+                }
+
+                clearTimeout(
+                    timeout,
+                );
+
+                this.pending.delete(
+                    requestId,
+                );
+
+                reject(
+                    new Error(
+                        `Node ${nodeId} is offline`,
+                    ),
                 );
             },
         );
@@ -130,7 +162,9 @@ export class CommandService {
             message.requestId,
         );
 
-        pending.resolve(message);
+        pending.resolve(
+            message,
+        );
 
         return true;
     }
@@ -138,12 +172,17 @@ export class CommandService {
     public rejectAll(
         reason: Error,
     ): void {
-        for (const pending of this.pending.values()) {
+        for (
+            const pending of
+            this.pending.values()
+            ) {
             clearTimeout(
                 pending.timeout,
             );
 
-            pending.reject(reason);
+            pending.reject(
+                reason,
+            );
         }
 
         this.pending.clear();

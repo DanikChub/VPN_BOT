@@ -26,12 +26,12 @@ class VpnNodeService {
         nodeId: number,
         heartbeat: HeartbeatPayload,
     ): Promise<VpnNode> {
-        console.log(nodeId)
+
         const node =
             await VpnNode.findByPk(
                 nodeId,
             );
-        console.log(node)
+
 
         if (!node) {
             throw new Error(
@@ -89,77 +89,39 @@ class VpnNodeService {
 
 
 
-    async markOffline(
+    public async markReady(
         nodeId: number,
+        info: {
+            version: string;
+            nodeVersion?: string;
+            platform?: string;
+            architecture?: string;
+        },
     ): Promise<void> {
 
-        await VpnNode.update(
-            {
-                status:
-                    "offline",
-            },
-            {
-                where: {
-                    id: nodeId,
-                },
-            },
-        );
-    }
+        const node =
+            await VpnNode.findByPk(nodeId);
 
+        if (!node) {
+            throw new Error(
+                "VPN node not found",
+            );
+        }
 
+        await node.update({
 
-    async getById(
-        nodeId: number,
-    ): Promise<VpnNode | null> {
+            install_status:
+                "ready",
 
-        return VpnNode.findByPk(
-            nodeId,
-        );
-    }
+            status:
+                "online",
 
-    async create(
-        data: {
-            name: string;
-
-            host: string;
-
-            port: number;
-
-            ssh_port: number;
-
-            ssh_user: string;
-
-            reality_public_key: string;
-
-            reality_server_name: string;
-
-            reality_short_id: string;
-        },
-    ): Promise<VpnNode> {
-
-        return VpnNode.create({
-            ...data,
-
-            is_active: true,
+            last_seen_at:
+                new Date(),
 
         });
+
     }
-
-
-
-    async getAll(): Promise<VpnNode[]> {
-
-        return VpnNode.findAll({
-            order: [
-                [
-                    "id",
-                    "ASC",
-                ],
-            ],
-        });
-    }
-
-
 
 }
 

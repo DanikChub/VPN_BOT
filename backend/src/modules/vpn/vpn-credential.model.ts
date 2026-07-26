@@ -47,6 +47,7 @@ VpnCredential.init(
         sequelize,
         tableName: "vpn_credentials",
         underscored: true,
+        timestamps: false,
     }
 );
 
