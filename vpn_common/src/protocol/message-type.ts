@@ -16,4 +16,8 @@ export enum MessageType {
     COMMAND_RESULT = "command-result",
 
     ERROR = "error",
+
+    INITIAL_SYNC = "initial-sync",
+
+    SYNC_RESULT = "sync-result",
 }

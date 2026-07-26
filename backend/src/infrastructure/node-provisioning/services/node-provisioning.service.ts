@@ -7,6 +7,7 @@ import { ScpClient } from "../ssh/scp.client";
 
 import { XrayInstaller } from "../installers/xray.installer";
 import { AgentInstaller } from "../installers/agent.installer";
+import nodeInstallStepService from "../../../modules/vpn-nodes/node-install-step.service";
 
 interface InstallCredentials {
     sshPassword: string;
@@ -22,13 +23,18 @@ class NodeProvisioningService {
         const node =
             await VpnNode.findByPk(nodeId);
 
+
         if (!node) {
-            throw new Error("VPN node not found");
+            throw new Error(
+                "VPN node not found",
+            );
         }
+
 
         const token =
             randomBytes(32)
                 .toString("hex");
+
 
         await node.update({
 
@@ -39,6 +45,8 @@ class NodeProvisioningService {
             token,
 
         });
+
+
 
         const ssh =
             new SSHClient({
@@ -57,6 +65,8 @@ class NodeProvisioningService {
 
             });
 
+
+
         const scp =
             new ScpClient({
 
@@ -74,35 +84,85 @@ class NodeProvisioningService {
 
             });
 
+
+
         try {
+
+
+            await nodeInstallStepService.run(
+                node.id,
+
+                "ssh_connect",
+
+                async()=>{
+
+                    await ssh.exec(
+                        "echo SSH_CONNECTED",
+                    );
+
+                },
+            );
+
+
 
             const xray =
                 new XrayInstaller(
                     ssh,
                 );
 
-            await xray.install();
+
+
+            await nodeInstallStepService.run(
+                node.id,
+
+                "install_xray",
+
+                async()=>{
+
+                    await xray.install();
+
+                },
+            );
+
+
 
             const agent =
                 new AgentInstaller(
                     ssh,
-                    scp,
+                    scp
                 );
 
-            await agent.install({
 
-                nodeId:
+
+            await nodeInstallStepService.run(
                 node.id,
 
-                token,
+                "install_agent",
 
-                controlServerUrl:
-                    process.env.AGENT_CONTROL_SERVER_URL!,
+                async()=>{
 
-                heartbeatIntervalMs:
-                    10000,
 
-            });
+                    await agent.install({
+
+                        nodeId:
+                        node.id,
+
+                        token,
+
+                        controlServerUrl:
+                            process.env.AGENT_CONTROL_SERVER_URL!,
+
+
+                        heartbeatIntervalMs:
+                            10000,
+
+                    });
+
+
+                },
+            );
+
+
 
             await node.update({
 
@@ -111,7 +171,10 @@ class NodeProvisioningService {
 
             });
 
-        } catch (error) {
+
+        }
+        catch(error){
+
 
             await node.update({
 
@@ -120,8 +183,11 @@ class NodeProvisioningService {
 
             });
 
+
             throw error;
+
         }
+
     }
 }
 

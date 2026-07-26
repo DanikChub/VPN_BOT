@@ -7,7 +7,9 @@ import {
 import type {
     CreateNodeDto,
 } from "./admin-nodes.types";
-import nodeProvisioningService from "../../../infrastructure/node-provisioning/services/node-provisioning.service";
+import nodeProvisioningService from "../../../provisioning/provisioning.service";
+import {randomBytes} from "node:crypto";
+
 
 
 
@@ -44,35 +46,67 @@ class AdminNodesService {
     async create(
         dto: CreateNodeDto,
     ) {
-        const node = await VpnNode.create({
-            name: dto.name,
+
+        let node =
+            await VpnNode.findOne({
+                where: {
+                    host: dto.host,
+                },
+            });
+
+        let agentToken =
+            node?.agent_token;
+
+        if (!node) {
+            agentToken = randomBytes(32).toString("hex");
+            node = await VpnNode.create({
+                name: dto.name,
+                host: dto.host,
+                port: dto.port,
+
+                ssh_port: dto.sshPort,
+                ssh_user: dto.sshUser,
+
+                inbound_tag:
+                    "vless-reality-in",
+
+                is_active: true,
+                status: "offline",
+                install_status: "pending",
+
+                reality_public_key: "",
+                reality_server_name: "",
+                reality_short_id: "",
+                agent_token: agentToken
+            });
+        }
+
+        if (!agentToken) {
+            throw new Error(
+                "Node agent token is missing",
+            );
+        }
+
+
+        const provisioningResult = await nodeProvisioningService.install({
+            nodeId: node.id,
             host: dto.host,
-            port: dto.port,
+            sshPort: dto.sshPort,
+            sshUser: dto.sshUser,
+            sshPassword: dto.sshPassword,
+            token: agentToken,
+            controlServerUrl:
+                process.env.AGENT_CONTROL_SERVER_URL!,
 
-            ssh_port: dto.sshPort,
-            ssh_user: dto.sshUser,
-
-            inbound_tag:
-                "vless-reality-in",
-
-            is_active: true,
-            status: "offline",
-            install_status: "pending",
-
-            reality_public_key: "",
-            reality_server_name: "",
-            reality_short_id: "",
         });
 
-        await nodeProvisioningService.install(
-            node.id,
-            {
-                sshPassword:
-                dto.sshPassword,
-            },
-        );
-
-        await node.reload();
+        await node.update({
+            reality_public_key: provisioningResult.realityPublicKey,
+            reality_short_id: provisioningResult.realityShortId,
+            reality_server_name: provisioningResult.serverName,
+            port: provisioningResult.port,
+            inbound_tag: provisioningResult.inboundTag,
+        });
 
         return mapNodeToAdminResponse(
             node,

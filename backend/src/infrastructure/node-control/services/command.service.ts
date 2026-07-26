@@ -138,6 +138,20 @@ export class CommandService {
         );
     }
 
+    public sendMessage(
+        nodeId:number,
+        message:unknown,
+    ):boolean{
+
+
+        return this.nodeRegistry.send(
+            nodeId,
+            message,
+        );
+
+
+    }
+
     public complete(
         message: CommandResultMessage,
     ): boolean {

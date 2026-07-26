@@ -1,6 +1,5 @@
 import {
     MessageType,
-    AgentCommandType,
     type HelloMessage,
 } from "@vpn/common";
 
@@ -13,25 +12,39 @@ import type {
 } from "../registry/node-registry";
 
 import VpnNode from "../../../modules/vpn-nodes/vpn-node.model";
-import {CommandService} from "../services/command.service";
+
+import NodeInitializationService
+    from "../../../modules/vpn-nodes/node-initialization.service";
+
 
 export class HelloHandler {
+
     public constructor(
+
         private readonly registry:
         NodeRegistry,
 
-        private readonly commandService:
-        CommandService,
+
+        private readonly nodeInitializationService:
+        NodeInitializationService,
+
     ) {}
+
+
 
     public handle = async (
         context: AgentMessageContext<HelloMessage>,
     ): Promise<void> => {
+
+
         const {
             socket,
             message,
             remoteAddress,
+
         } = context;
+
+
 
         const {
             nodeId,
@@ -40,14 +53,20 @@ export class HelloHandler {
             nodeVersion,
             platform,
             architecture,
+
         } = message.payload;
+
+
 
         const node =
             await VpnNode.findByPk(
                 nodeId,
             );
 
+
+
         if (!node) {
+
             socket.close(
                 4001,
                 "Unknown node",
@@ -56,10 +75,16 @@ export class HelloHandler {
             return;
         }
 
+
+
         if (
+
             !node.agent_token ||
+
             node.agent_token !== token
+
         ) {
+
             socket.close(
                 4002,
                 "Invalid token",
@@ -68,140 +93,144 @@ export class HelloHandler {
             return;
         }
 
+
+
+
         const existingAgent =
             this.registry.findBySocket(
                 socket,
             );
 
+
+
         if (existingAgent) {
+
             socket.close(
                 4003,
                 "Agent already authenticated",
             );
 
             return;
+
         }
 
+
+
+
         this.registry.register({
-            nodeId: node.id,
+
+            nodeId:
+            node.id,
+
             socket,
+
             remoteAddress,
+
             agentVersion,
+
             nodeVersion,
+
             platform,
+
             architecture,
+
         });
+
+
+
+
 
         await node.update({
 
-            status: "online",
-            last_seen_at: new Date(),
+            status:
+                "online",
+
+            last_seen_at:
+                new Date(),
+
         });
 
+
+
+
+
         socket.send(
+
             JSON.stringify({
+
                 type:
                 MessageType.HELLO_ACK,
+
 
                 requestId:
                 message.requestId,
 
+
                 payload: {
-                    nodeId: node.id,
-                    accepted: true,
-                },
-            }),
-        );
 
-        if (node.install_status !== "ready") {
-            setImmediate(() => {
-                void this.configureXray(
-                    node,
-                );
-            });
-        }
-
-        console.log(
-            [
-                "Node authenticated:",
-                `nodeId=${node.id}`,
-                `address=${remoteAddress}`,
-                `agentVersion=${agentVersion}`,
-                `nodeVersion=${nodeVersion}`,
-            ].join(" "),
-        );
-    };
-
-    private async configureXray(
-        node: VpnNode,
-    ): Promise<void> {
-        try {
-            console.log(
-                `Configuring Xray on node ${node.id}`,
-            );
-
-            const result =
-                await this.commandService.sendCommand(
+                    nodeId:
                     node.id,
 
-                    AgentCommandType.CONFIGURE_XRAY,
 
-                    {
-                        port:
-                            443,
+                    accepted:
+                        true,
 
-                        inboundTag:
-                            "vless-reality-in",
+                },
 
-                        serverName:
-                            "www.microsoft.com",
-                    },
-                );
+            }),
 
-            console.log(
-                "Xray configuration result:",
-                JSON.stringify(
-                    result,
-                    null,
-                    2,
-                ),
-            );
+        );
 
-            /*
-             * Пока только для первой проверки.
-             * После того как увидим точную структуру
-             * CommandResultMessage, сохраним:
-             *
-             * realityPublicKey
-             * realityShortId
-             * port
-             * inboundTag
-             */
 
-            await node.update({
-                install_status:
-                    "ready",
 
-                status:
-                    "online",
 
-                last_seen_at:
-                    new Date(),
-            });
 
-            console.log(
-                `Xray configured on node ${node.id}`,
-            );
-        } catch (error) {
-            console.error(
-                `Failed to configure Xray on node ${node.id}`,
-                error,
-            );
+        /*
+         *
+         * Первичная инициализация узла.
+         *
+         * Выполняется только после установки агента.
+         *
+         */
 
-            await node.update({
-                install_status:
-                    "failed",
-            });
+        if (
+
+            node.install_status ===
+            "waiting_agent"
+
+        ) {
+
+
+            void this.nodeInitializationService
+                .initialize(node);
+
+
         }
-    }
+
+
+
+
+        console.log(
+
+            [
+
+                "Node authenticated:",
+
+                `nodeId=${node.id}`,
+
+                `address=${remoteAddress}`,
+
+                `agentVersion=${agentVersion}`,
+
+                `nodeVersion=${nodeVersion}`,
+
+            ]
+
+                .join(" ")
+
+        );
+
+
+    };
+
 }
