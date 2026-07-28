@@ -1,8 +1,7 @@
 import type http from "node:http";
+import {AgentWebSocketServer} from "../infrastructure/agent/transport/agent-websocket.server";
 
-import type {
-    AgentWebSocketServer,
-} from "../infrastructure/node-control/websocket/agent-websocket.server";
+
 
 
 let shuttingDown = false;

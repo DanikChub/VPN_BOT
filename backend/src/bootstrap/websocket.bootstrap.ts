@@ -1,6 +1,4 @@
-import {
-    setupAgentWebSocket,
-} from "../infrastructure/node-control/websocket/agent-websocket.bootstrap";
+import {setupAgentWebSocket} from "../infrastructure/agent/transport/setup-agent-websocket";
 
 
 export function startAgentWebSocket(

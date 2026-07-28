@@ -55,7 +55,6 @@ export function setupAgentWebSocket(
     const helloHandler =
         new HelloHandler(
             nodeRegistry,
-            commandService,
         );
 
 

@@ -34,9 +34,11 @@ export interface XrayConfigurationResult {
 
 export class XrayConfigurator {
 
+
     constructor(
         private readonly ssh: SSHClient,
     ) {}
+
 
 
     async configure(
@@ -48,51 +50,129 @@ export class XrayConfigurator {
             await this.generateKeys();
 
 
+
         const shortId =
             randomBytes(8)
                 .toString("hex");
 
 
+
         const config = {
 
             log: {
-                loglevel: "warning",
+                loglevel:
+                    "warning",
             },
 
+
+            api: {
+
+                tag:
+                    "api",
+
+                listen:
+                    "127.0.0.1:10085",
+
+                services: [
+                    "HandlerService",
+                    "StatsService",
+                ],
+            },
+
+
+            stats: {},
+
+
+            policy: {
+
+                levels: {
+
+                    "0": {
+
+                        statsUserUplink:
+                            true,
+
+                        statsUserDownlink:
+                            true,
+                    },
+                },
+
+
+                system: {
+
+                    statsInboundUplink:
+                        true,
+
+                    statsInboundDownlink:
+                        true,
+
+                    statsOutboundUplink:
+                        true,
+
+                    statsOutboundDownlink:
+                        true,
+                },
+            },
+
+
+
             inbounds: [
+
                 {
-                    tag: options.inboundTag,
+                    tag:
+                    options.inboundTag,
 
-                    listen: "0.0.0.0",
 
-                    port: options.port,
+                    listen:
+                        "0.0.0.0",
 
-                    protocol: "vless",
+
+                    port:
+                    options.port,
+
+
+                    protocol:
+                        "vless",
+
 
                     settings: {
+
                         clients: [],
 
-                        decryption: "none",
+
+                        decryption:
+                            "none",
                     },
 
-                    streamSettings: {
-                        network: "tcp",
 
-                        security: "reality",
+                    streamSettings: {
+
+                        network:
+                            "tcp",
+
+
+                        security:
+                            "reality",
+
 
                         realitySettings: {
 
-                            show: false,
+                            show:
+                                false,
+
 
                             dest:
                                 `${options.serverName}:443`,
+
 
                             serverNames: [
                                 options.serverName,
                             ],
 
+
                             privateKey:
                             keys.privateKey,
+
 
                             shortIds: [
                                 shortId,
@@ -102,12 +182,43 @@ export class XrayConfigurator {
                 },
             ],
 
+
+
             outbounds: [
+
                 {
-                    protocol: "freedom",
+                    protocol:
+                        "freedom",
                 },
             ],
+
+
+
+            routing: {
+
+                domainStrategy:
+                    "AsIs",
+
+
+                rules: [
+
+                    {
+                        type:
+                            "field",
+
+
+                        inboundTag: [
+                            "api",
+                        ],
+
+
+                        outboundTag:
+                            "api",
+                    },
+                ],
+            },
         };
+
 
 
         await this.writeConfig(
@@ -115,10 +226,16 @@ export class XrayConfigurator {
         );
 
 
+
         await this.restart();
 
 
+
         await this.verify();
+
+
+
+        await this.verifyApi();
 
 
 
@@ -127,28 +244,37 @@ export class XrayConfigurator {
             port:
             options.port,
 
+
             inboundTag:
             options.inboundTag,
+
 
             serverName:
             options.serverName,
 
+
             realityPublicKey:
             keys.publicKey,
 
+
             realityShortId:
             shortId,
-
         };
 
     }
 
+
+
+
+
     private async generateKeys() {
+
 
         const result =
             await this.ssh.exec(`
 xray x25519
 `);
+
 
 
         const privateKey =
@@ -158,6 +284,7 @@ xray x25519
             );
 
 
+
         const publicKey =
             this.extract(
                 result,
@@ -165,10 +292,12 @@ xray x25519
             );
 
 
+
         if (
             !privateKey ||
             !publicKey
         ) {
+
             throw new Error(
                 "Failed to generate Reality keys\n" +
                 result,
@@ -176,16 +305,24 @@ xray x25519
         }
 
 
+
         return {
+
             privateKey,
+
             publicKey,
         };
 
     }
 
+
+
+
+
     private async writeConfig(
         config: unknown,
     ) {
+
 
         const json =
             JSON.stringify(
@@ -194,9 +331,13 @@ xray x25519
                 2,
             );
 
+
+
         await this.ssh.exec(`
 mkdir -p /usr/local/etc/xray
 `);
+
+
 
         await this.ssh.exec(`
 cat > /usr/local/etc/xray/config.json <<'EOF'
@@ -204,13 +345,20 @@ ${json}
 EOF
 `);
 
+
+
         await this.ssh.exec(`
 xray run -test -config /usr/local/etc/xray/config.json
 `);
 
     }
 
+
+
+
+
     private async restart() {
+
 
         await this.ssh.exec(`
 systemctl restart xray
@@ -218,7 +366,12 @@ systemctl restart xray
 
     }
 
+
+
+
+
     private async verify() {
+
 
         const status =
             await this.ssh.exec(`
@@ -226,14 +379,18 @@ systemctl is-active xray
 `);
 
 
+
         if (
-            status.trim() !== "active"
+            status.trim() !==
+            "active"
         ) {
+
 
             const logs =
                 await this.ssh.exec(`
 journalctl -u xray -n 100 --no-pager
 `);
+
 
 
             throw new Error(
@@ -244,10 +401,47 @@ journalctl -u xray -n 100 --no-pager
 
     }
 
+
+
+
+
+    private async verifyApi() {
+
+
+        const result =
+            await this.ssh.exec(`
+ss -lnt | grep 10085 || true
+`);
+
+
+
+        if (
+            !result.includes("10085")
+        ) {
+
+            const logs =
+                await this.ssh.exec(`
+journalctl -u xray -n 50 --no-pager
+`);
+
+
+            throw new Error(
+                "Xray API is not listening\n" +
+                logs,
+            );
+        }
+
+    }
+
+
+
+
+
     private extract(
         text: string,
         key: string,
     ): string | null {
+
 
         const line =
             text
@@ -258,9 +452,11 @@ journalctl -u xray -n 100 --no-pager
                 );
 
 
+
         if (!line) {
             return null;
         }
+
 
 
         return line

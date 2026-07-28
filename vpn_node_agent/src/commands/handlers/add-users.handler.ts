@@ -8,25 +8,21 @@ import type {
     CommandHandler,
     CommandHandlerContext,
 } from "../command-router.js";
-
-import type {
-    XrayService,
-} from "../../xray/xray.service.js";
+import type {XrayUserService} from "../../xray/xray-user.service.js";
 
 interface AddUsersHandlerOptions {
-    xrayService:
-        XrayService;
+    xrayUserService: XrayUserService;
 }
 
+
 export class AddUsersHandler {
-    private readonly xrayService:
-        XrayService;
+    private readonly xrayUserService: XrayUserService;
 
     public constructor(
         options: AddUsersHandlerOptions,
     ) {
-        this.xrayService =
-            options.xrayService;
+        this.xrayUserService =
+            options.xrayUserService;
     }
 
     public handle: CommandHandler =
@@ -38,9 +34,40 @@ export class AddUsersHandler {
                     context.arguments,
                 );
 
-            return await this.xrayService.addUsers(
-                arguments_,
-            );
+            for(
+                const user of arguments_.users
+                ){
+
+                await this.xrayUserService.addUser({
+                    inboundTag:
+                    arguments_.inboundTag,
+
+                    uuid:
+                    user.uuid,
+
+                    email:
+                    user.email,
+
+                    flow:
+                    user.flow,
+                });
+            }
+
+
+            return {
+                inboundTag:
+                arguments_.inboundTag,
+
+                addedEmails:
+                    arguments_.users.map(
+                        user => user.email,
+                    ),
+
+                existingEmails:[],
+
+                totalUsers:
+                arguments_.users.length,
+            };
         };
 
     private parseArguments(

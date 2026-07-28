@@ -3,7 +3,7 @@ import { Router } from "express";
 import controller from "./test.controller";
 import type { CommandService } from "../../infrastructure/node-control/services/command.service";
 import { AgentCommandType } from "@vpn/common";
-import {SSHClient} from "../../infrastructure/node-provisioning/ssh/ssh.client";
+
 
 
 export default function createTestRouter(
@@ -55,29 +55,6 @@ export default function createTestRouter(
         },
     );
 
-    router.get(
-        "/ssh",
-        async (req, res) => {
-
-            const ssh = new SSHClient({
-                host: "85.234.106.66",
-                port: 22,
-                username: "root",
-                password: "eMzxnPGx7#Ra49",
-            });
-
-
-            const result =
-                await ssh.exec(
-                    "whoami && hostname && uname -a"
-                );
-
-
-            res.json({
-                result,
-            });
-        },
-    );
 
 
     return router;

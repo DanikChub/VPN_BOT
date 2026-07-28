@@ -1,31 +1,53 @@
 import {
     NodeRegistry,
-} from "./node-control/registry/node-registry";
+} from "./agent/connection/node-registry";
+
 
 import {
     CommandService,
-} from "./node-control/services/command.service";
+} from "./agent/rpc/command.service";
 
-import AgentNodeControlService from "./node-control/services/agent-node-control.service";
 
 import {
-    VpnAccessService,
-} from "../modules/vpn/vpn-access.service";
+    AgentCommandBus,
+} from "./agent/command-bus/agent-command-bus";
+
+
+import AgentNodeControlService
+    from "../modules/vpn/node-control/agent-node-control.service";
+import {AgentMessageSender} from "./agent/transport/message-sender";
+import {VpnAccessService} from "../modules/vpn/vpn-access.service";
+
+
 
 export const nodeRegistry =
     new NodeRegistry();
+
+
 
 export const commandService =
     new CommandService({
         nodeRegistry,
     });
 
+
+
+export const commandBus =
+    new AgentCommandBus(
+        commandService,
+    );
+
+
+
 export const nodeControlService =
     new AgentNodeControlService(
-        commandService,
+        commandBus,
     );
 
 export const vpnAccessService =
     new VpnAccessService(
         nodeControlService,
     );
+
+export const messageSender =
+    new AgentMessageSender();

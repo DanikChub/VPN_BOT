@@ -18,14 +18,6 @@ import {
 } from "./commands/handlers/get-status.handler.js";
 
 import {
-    ConfigureXrayHandler,
-} from "./commands/handlers/configure-xray.handler.js";
-
-import {
-    XrayService,
-} from "./xray/xray.service.js";
-
-import {
     HeartbeatService,
 } from "./heartbeat/heartbeat.service.js";
 
@@ -40,6 +32,8 @@ import {
 import {
     RemoveUsersHandler,
 } from "./commands/handlers/remove-users.handler.js";
+import {XrayApiClient} from "./xray/api/xray-api.client.js";
+import {XrayUserService} from "./xray/xray-user.service.js";
 
 export class AgentApp {
     private isStarted = false;
@@ -47,11 +41,6 @@ export class AgentApp {
     private readonly connection:
         AgentConnection;
 
-    private readonly xrayService:
-        XrayService;
-
-    private readonly configureXrayHandler:
-        ConfigureXrayHandler;
 
     private heartbeatService:
         HeartbeatService | undefined;
@@ -59,8 +48,7 @@ export class AgentApp {
     private readonly addUsersHandler:
         AddUsersHandler;
 
-    private readonly removeUsersHandler:
-        RemoveUsersHandler;
+
 
     public constructor() {
         this.connection =
@@ -91,29 +79,22 @@ export class AgentApp {
                 healthService,
             );
 
-        this.xrayService =
-            new XrayService();
+
+        const xrayApi =
+            new XrayApiClient();
 
 
-
-        this.configureXrayHandler =
-            new ConfigureXrayHandler({
-                xrayService:
-                this.xrayService,
-            });
+        const xrayUserService =
+            new XrayUserService(
+                xrayApi,
+            );
 
 
         this.addUsersHandler =
             new AddUsersHandler({
-                xrayService:
-                this.xrayService,
+                xrayUserService,
             });
 
-        this.removeUsersHandler =
-            new RemoveUsersHandler({
-                xrayService:
-                this.xrayService,
-            });
     }
 
     public async start():
@@ -152,20 +133,12 @@ export class AgentApp {
             getStatusHandler,
         );
 
-        commandRouter.register(
-            AgentCommandType.CONFIGURE_XRAY,
-            this.configureXrayHandler.handle,
-        );
 
         commandRouter.register(
             AgentCommandType.ADD_USERS,
             this.addUsersHandler.handle,
         );
 
-        commandRouter.register(
-            AgentCommandType.REMOVE_USERS,
-            this.removeUsersHandler.handle,
-        );
 
         this.connection.setCommandRouter(
             commandRouter,

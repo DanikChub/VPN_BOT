@@ -8,24 +8,25 @@ import type {
     CommandHandlerContext,
 } from "../command-router.js";
 
-import type {
-    XrayService,
-} from "../../xray/xray.service.js";
+import type {XrayUserService} from "../../xray/xray-user.service.js";
+
+
 
 interface RemoveUsersHandlerOptions {
-    xrayService:
-        XrayService;
-}
 
+    xrayUserService:
+        XrayUserService;
+
+}
 export class RemoveUsersHandler {
-    private readonly xrayService:
-        XrayService;
+    private readonly xrayUserService:
+        XrayUserService;
 
     public constructor(
         options: RemoveUsersHandlerOptions,
     ) {
-        this.xrayService =
-            options.xrayService;
+        this.xrayUserService =
+            options.xrayUserService;
     }
 
     public handle: CommandHandler =
@@ -37,8 +38,8 @@ export class RemoveUsersHandler {
                     context.arguments,
                 );
 
-            return await this.xrayService.removeUsers(
-                arguments_,
+            throw new Error(
+                "remove users via Xray API is not implemented yet",
             );
         };
 

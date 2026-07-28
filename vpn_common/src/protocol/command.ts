@@ -2,8 +2,6 @@ import { MessageType } from "./message-type.js";
 import type { ProtocolMessage } from "./message.js";
 
 export enum AgentCommandType {
-    CONFIGURE_XRAY = "configure-xray",
-
     ADD_USERS = "add-users",
     REMOVE_USERS = "remove-users",
 
