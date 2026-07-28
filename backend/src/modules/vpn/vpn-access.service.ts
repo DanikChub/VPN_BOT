@@ -1,6 +1,7 @@
 import VpnCredential from "./vpn-credential.model";
 import VpnNode from "../vpn-nodes/vpn-node.model";
-import {NodeControlService} from "../../infrastructure/node-control/services/node-control.service";
+import {NodeControlService} from "./node-control/node-control.service";
+
 
 
 

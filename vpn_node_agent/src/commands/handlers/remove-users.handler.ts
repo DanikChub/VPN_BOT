@@ -1,116 +1,159 @@
-import type {
-    RemoveUsersCommandArguments,
-    RemoveUsersCommandResult,
+import {
+    type RemoveUsersCommandArguments,
+    type RemoveUsersCommandResult,
 } from "@vpn/common";
 
-import type {
-    CommandHandler,
-    CommandHandlerContext,
+import {
+    type CommandHandlerContext,
 } from "../command-router.js";
 
-import type {XrayUserService} from "../../xray/xray-user.service.js";
+import {
+    XrayUserService,
+} from "../../xray/xray-user.service.js";
 
+import {
+    XrayAppliedUsersStore,
+} from "../../xray/xray-applied-users.store.js";
 
-
-interface RemoveUsersHandlerOptions {
-
-    xrayUserService:
-        XrayUserService;
-
-}
 export class RemoveUsersHandler {
-    private readonly xrayUserService:
-        XrayUserService;
-
     public constructor(
-        options: RemoveUsersHandlerOptions,
-    ) {
-        this.xrayUserService =
-            options.xrayUserService;
-    }
+        private readonly xrayUserService:
+        XrayUserService,
 
-    public handle: CommandHandler =
-        async (
-            context: CommandHandlerContext,
-        ): Promise<RemoveUsersCommandResult> => {
-            const arguments_ =
-                this.parseArguments(
-                    context.arguments,
+        private readonly appliedUsersStore:
+        XrayAppliedUsersStore,
+    ) {}
+
+    public readonly handle = async (
+        context: CommandHandlerContext,
+    ): Promise<RemoveUsersCommandResult> => {
+        const args =
+            this.parseArguments(
+                context.arguments,
+            );
+
+        const removedEmails: string[] = [];
+        const missingEmails: string[] = [];
+
+        for (const email of args.emails) {
+            const wasKnown =
+                this.appliedUsersStore.hasUser(
+                    args.inboundTag,
+                    email,
                 );
 
-            throw new Error(
-                "remove users via Xray API is not implemented yet",
+            await this.xrayUserService.removeUser({
+                inboundTag:
+                args.inboundTag,
+
+                email,
+            });
+
+            this.appliedUsersStore.removeUser(
+                args.inboundTag,
+                email,
             );
+
+            if (wasKnown) {
+                removedEmails.push(
+                    email,
+                );
+            } else {
+                missingEmails.push(
+                    email,
+                );
+            }
+        }
+
+        return {
+            inboundTag:
+            args.inboundTag,
+
+            removedEmails,
+
+            missingEmails,
+
+            totalUsers:
+            this.appliedUsersStore
+                .getUsers(
+                    args.inboundTag,
+                )
+                .length,
         };
+    };
 
     private parseArguments(
         value: unknown,
     ): RemoveUsersCommandArguments {
         if (
             typeof value !== "object" ||
-            value === null ||
-            Array.isArray(value)
+            value === null
         ) {
             throw new Error(
-                "remove-users arguments must be an object",
+                "REMOVE_USERS arguments must be an object",
             );
         }
 
-        const arguments_ =
+        const rawArguments =
             value as Record<
                 string,
                 unknown
             >;
 
         if (
-            typeof arguments_.inboundTag !==
+            typeof rawArguments.inboundTag !==
             "string" ||
-            arguments_.inboundTag.trim()
-                .length === 0
+            !rawArguments.inboundTag.trim()
         ) {
             throw new Error(
-                "remove-users inboundTag is required",
+                "REMOVE_USERS inboundTag is required",
             );
         }
 
         if (
             !Array.isArray(
-                arguments_.emails,
-            ) ||
-            arguments_.emails.length === 0
+                rawArguments.emails,
+            )
         ) {
             throw new Error(
-                "remove-users emails must be a non-empty array",
+                "REMOVE_USERS emails must be an array",
             );
         }
 
-        const emails =
-            arguments_.emails.map(
-                (
-                    email,
-                    index,
-                ) => {
-                    if (
-                        typeof email !==
-                        "string" ||
-                        email.trim()
-                            .length === 0
-                    ) {
-                        throw new Error(
-                            `remove-users emails[${index}] must be a non-empty string`,
-                        );
-                    }
+        const uniqueEmails =
+            new Set<string>();
 
-                    return email.trim();
-                },
+        for (
+            let index = 0;
+            index <
+            rawArguments.emails.length;
+            index++
+        ) {
+            const rawEmail =
+                rawArguments.emails[index];
+
+            if (
+                typeof rawEmail !== "string" ||
+                !rawEmail.trim()
+            ) {
+                throw new Error(
+                    `REMOVE_USERS email at index ${index} is invalid`,
+                );
+            }
+
+            uniqueEmails.add(
+                rawEmail.trim(),
             );
+        }
 
         return {
             inboundTag:
-                arguments_.inboundTag
-                    .trim(),
+                rawArguments.inboundTag.trim(),
 
-            emails,
+            emails:
+                Array.from(
+                    uniqueEmails,
+                ),
         };
     }
 }

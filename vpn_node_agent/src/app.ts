@@ -32,8 +32,22 @@ import {
 import {
     RemoveUsersHandler,
 } from "./commands/handlers/remove-users.handler.js";
-import {XrayApiClient} from "./xray/api/xray-api.client.js";
-import {XrayUserService} from "./xray/xray-user.service.js";
+
+import {
+    SyncUsersHandler,
+} from "./commands/handlers/sync-users.handler.js";
+
+import {
+    XrayApiClient,
+} from "./xray/api/xray-api.client.js";
+
+import {
+    XrayUserService,
+} from "./xray/xray-user.service.js";
+
+import {
+    XrayAppliedUsersStore,
+} from "./xray/xray-applied-users.store.js";
 
 export class AgentApp {
     private isStarted = false;
@@ -41,14 +55,17 @@ export class AgentApp {
     private readonly connection:
         AgentConnection;
 
-
-    private heartbeatService:
-        HeartbeatService | undefined;
+    private readonly heartbeatService:
+        HeartbeatService;
 
     private readonly addUsersHandler:
         AddUsersHandler;
 
+    private readonly removeUsersHandler:
+        RemoveUsersHandler;
 
+    private readonly syncUsersHandler:
+        SyncUsersHandler;
 
     public constructor() {
         this.connection =
@@ -79,22 +96,38 @@ export class AgentApp {
                 healthService,
             );
 
-
-        const xrayApi =
+        const xrayApiClient =
             new XrayApiClient();
-
 
         const xrayUserService =
             new XrayUserService(
-                xrayApi,
+                xrayApiClient,
             );
 
+        /*
+         * Один общий экземпляр store
+         * для всех Xray handlers.
+         */
+        const xrayAppliedUsersStore =
+            new XrayAppliedUsersStore();
 
         this.addUsersHandler =
-            new AddUsersHandler({
+            new AddUsersHandler(
                 xrayUserService,
-            });
+                xrayAppliedUsersStore,
+            );
 
+        this.removeUsersHandler =
+            new RemoveUsersHandler(
+                xrayUserService,
+                xrayAppliedUsersStore,
+            );
+
+        this.syncUsersHandler =
+            new SyncUsersHandler(
+                xrayUserService,
+                xrayAppliedUsersStore,
+            );
     }
 
     public async start():
@@ -133,12 +166,20 @@ export class AgentApp {
             getStatusHandler,
         );
 
-
         commandRouter.register(
             AgentCommandType.ADD_USERS,
             this.addUsersHandler.handle,
         );
 
+        commandRouter.register(
+            AgentCommandType.REMOVE_USERS,
+            this.removeUsersHandler.handle,
+        );
+
+        commandRouter.register(
+            AgentCommandType.SYNC_USERS,
+            this.syncUsersHandler.handle,
+        );
 
         this.connection.setCommandRouter(
             commandRouter,
@@ -147,7 +188,7 @@ export class AgentApp {
         try {
             await this.connection.connect();
 
-            this.heartbeatService?.start();
+            this.heartbeatService.start();
 
             this.isStarted = true;
 
@@ -184,7 +225,7 @@ export class AgentApp {
         );
 
         try {
-            this.heartbeatService?.stop();
+            this.heartbeatService.stop();
 
             await this.connection.disconnect();
         } catch (error) {

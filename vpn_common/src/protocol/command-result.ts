@@ -1,5 +1,6 @@
 import { MessageType } from "./message-type.js";
 import type { ProtocolMessage } from "./message.js";
+import type {SyncUsersMode} from "./command.js";
 
 export interface CommandResultPayload {
     success: boolean;
@@ -31,6 +32,19 @@ export interface RemoveUsersCommandResult {
     removedEmails: string[];
 
     missingEmails: string[];
+
+    totalUsers: number;
+}
+
+
+export interface SyncUsersCommandResult {
+    mode: SyncUsersMode;
+
+    desiredEmails: string[];
+
+    addedEmails: string[];
+
+    removedEmails: string[];
 
     totalUsers: number;
 }

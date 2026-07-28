@@ -1,6 +1,6 @@
 import {
-    type AddUsersCommandArguments,
-    type AddUsersCommandResult,
+    type SyncUsersCommandArguments,
+    type SyncUsersCommandResult,
     type XrayUser,
 } from "@vpn/common";
 
@@ -16,7 +16,7 @@ import {
     XrayAppliedUsersStore,
 } from "../../xray/xray-applied-users.store.js";
 
-export class AddUsersHandler {
+export class SyncUsersHandler {
     public constructor(
         private readonly xrayUserService:
         XrayUserService,
@@ -27,79 +27,52 @@ export class AddUsersHandler {
 
     public readonly handle = async (
         context: CommandHandlerContext,
-    ): Promise<AddUsersCommandResult> => {
+    ): Promise<SyncUsersCommandResult> => {
         const args =
             this.parseArguments(
                 context.arguments,
             );
 
-        const addedEmails: string[] = [];
-        const existingEmails: string[] = [];
+        const knownEmails =
+            this.appliedUsersStore.getEmails(
+                args.inboundTag,
+            );
 
-        for (const user of args.users) {
-            const alreadyKnown =
-                this.appliedUsersStore.hasUser(
-                    args.inboundTag,
-                    user.email,
-                );
-
-            await this.xrayUserService.addUser({
+        const result =
+            await this.xrayUserService.syncUsers({
                 inboundTag:
                 args.inboundTag,
 
-                uuid:
-                user.uuid,
+                desiredUsers:
+                args.users,
 
-                email:
-                user.email,
+                knownEmails,
 
-                flow:
-                user.flow,
+                mode:
+                args.mode,
             });
 
-            this.appliedUsersStore.addUser(
-                args.inboundTag,
-                user,
-            );
-
-            if (alreadyKnown) {
-                existingEmails.push(
-                    user.email,
-                );
-            } else {
-                addedEmails.push(
-                    user.email,
-                );
-            }
-        }
-
-        return {
-            inboundTag:
+        /*
+         * Store заменяем только после полной
+         * успешной синхронизации.
+         */
+        this.appliedUsersStore.replaceUsers(
             args.inboundTag,
+            args.users,
+        );
 
-            addedEmails,
-
-            existingEmails,
-
-            totalUsers:
-            this.appliedUsersStore
-                .getUsers(
-                    args.inboundTag,
-                )
-                .length,
-        };
+        return result;
     };
-
 
     private parseArguments(
         value: unknown,
-    ): AddUsersCommandArguments {
+    ): SyncUsersCommandArguments {
         if (
             typeof value !== "object" ||
             value === null
         ) {
             throw new Error(
-                "ADD_USERS arguments must be an object",
+                "SYNC_USERS arguments must be an object",
             );
         }
 
@@ -115,7 +88,18 @@ export class AddUsersHandler {
             !rawArguments.inboundTag.trim()
         ) {
             throw new Error(
-                "ADD_USERS inboundTag is required",
+                "SYNC_USERS inboundTag is required",
+            );
+        }
+
+        if (
+            rawArguments.mode !==
+            "reconcile" &&
+            rawArguments.mode !==
+            "rebuild"
+        ) {
+            throw new Error(
+                `Unsupported SYNC_USERS mode: ${String(rawArguments.mode)}`,
             );
         }
 
@@ -125,7 +109,7 @@ export class AddUsersHandler {
             )
         ) {
             throw new Error(
-                "ADD_USERS users must be an array",
+                "SYNC_USERS users must be an array",
             );
         }
 
@@ -143,7 +127,7 @@ export class AddUsersHandler {
                         rawUser === null
                     ) {
                         throw new Error(
-                            `ADD_USERS user at index ${index} must be an object`,
+                            `SYNC_USERS user at index ${index} must be an object`,
                         );
                     }
 
@@ -159,7 +143,7 @@ export class AddUsersHandler {
                         !user.uuid.trim()
                     ) {
                         throw new Error(
-                            `ADD_USERS uuid is required at index ${index}`,
+                            `SYNC_USERS uuid is required at index ${index}`,
                         );
                     }
 
@@ -169,7 +153,7 @@ export class AddUsersHandler {
                         !user.email.trim()
                     ) {
                         throw new Error(
-                            `ADD_USERS email is required at index ${index}`,
+                            `SYNC_USERS email is required at index ${index}`,
                         );
                     }
 
@@ -210,6 +194,9 @@ export class AddUsersHandler {
         return {
             inboundTag:
                 rawArguments.inboundTag.trim(),
+
+            mode:
+            rawArguments.mode,
 
             users,
         };
