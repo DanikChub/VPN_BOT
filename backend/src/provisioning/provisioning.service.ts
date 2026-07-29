@@ -109,7 +109,7 @@ class NodeProvisioningService {
                     return await xrayConfigurator.configure({
                         port:443,
                         inboundTag:"vless-reality-in",
-                        serverName:"www.microsoft.com",
+                        serverName:"www.cloudflare.com",
                     });
                 },
             );

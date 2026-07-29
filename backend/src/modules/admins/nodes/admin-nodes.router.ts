@@ -1,7 +1,13 @@
-import { Router } from "express";
+import {
+    Router,
+} from "express";
 
-import { requirePermission } from "../middleware/require-permission.middleware";
-import adminNodesController from "./admin-nodes.controller";
+import {
+    requirePermission,
+} from "../middleware/require-permission.middleware";
+
+import adminNodesController
+    from "./admin-nodes.controller";
 
 
 const adminNodesRouter =
@@ -10,7 +16,9 @@ const adminNodesRouter =
 
 adminNodesRouter.get(
     "/",
-    requirePermission("nodes.read"),
+    requirePermission(
+        "nodes.read",
+    ),
     adminNodesController.getAll.bind(
         adminNodesController,
     ),
@@ -19,18 +27,34 @@ adminNodesRouter.get(
 
 adminNodesRouter.get(
     "/:id",
-    requirePermission("nodes.read"),
+    requirePermission(
+        "nodes.read",
+    ),
     adminNodesController.getById.bind(
         adminNodesController,
     ),
 );
 
+
 adminNodesRouter.post(
     "/",
-    requirePermission("nodes.create"),
+    requirePermission(
+        "nodes.create",
+    ),
     adminNodesController.create.bind(
-        adminNodesController
-    )
+        adminNodesController,
+    ),
+);
+
+
+adminNodesRouter.post(
+    "/:id/sync-users",
+    requirePermission(
+        "nodes.sync",
+    ),
+    adminNodesController.syncUsers.bind(
+        adminNodesController,
+    ),
 );
 
 

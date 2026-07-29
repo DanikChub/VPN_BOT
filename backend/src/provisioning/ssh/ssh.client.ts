@@ -147,125 +147,106 @@ export class SSHClient {
 
 
     async exec(
-        command:string,
-    ):Promise<string>{
-
-
-        if(
+        command: string,
+    ): Promise<string> {
+        if (
             !this.client ||
             !this.connected
-        ){
-
+        ) {
             throw new Error(
                 "SSH client is not connected",
             );
-
         }
-
-
-
 
         return new Promise<string>(
             (
                 resolve,
                 reject,
-            )=>{
-
-
+            ) => {
                 this.client!.exec(
                     command,
                     (
                         error,
                         stream,
-                    )=>{
-
-
-                        if(error){
-
+                    ) => {
+                        if (error) {
                             reject(error);
 
                             return;
-
                         }
 
-
-
                         let stdout = "";
-
                         let stderr = "";
-
-
 
                         stream.on(
                             "data",
                             (
-                                data:Buffer,
-                            )=>{
-
+                                data: Buffer,
+                            ) => {
                                 stdout +=
                                     data.toString();
-
                             },
                         );
-
-
 
                         stream.stderr.on(
                             "data",
                             (
-                                data:Buffer,
-                            )=>{
-
+                                data: Buffer,
+                            ) => {
                                 stderr +=
                                     data.toString();
-
                             },
                         );
 
-
-
-                        stream.on(
+                        stream.once(
                             "close",
                             (
-                                code:number,
-                            )=>{
-
-
-                                if(code !== 0){
-
-                                    reject(
-                                        new Error(
-                                            stderr ||
-                                            `SSH command failed: ${code}`,
-                                        ),
-                                    );
+                                code:
+                                    number | null,
+                                signal:
+                                    string | null,
+                            ) => {
+                                if (code === 0) {
+                                    resolve(stdout);
 
                                     return;
-
                                 }
 
+                                const details = [
+                                    `SSH command failed with exit code ${String(code)}`,
 
-                                resolve(
-                                    stdout,
+                                    signal
+                                        ? `Signal: ${signal}`
+                                        : null,
+
+                                    stderr.trim()
+                                        ? `stderr:\n${stderr.trim()}`
+                                        : null,
+
+                                    stdout.trim()
+                                        ? `stdout:\n${stdout.trim()}`
+                                        : null,
+                                ]
+                                    .filter(Boolean)
+                                    .join("\n\n");
+
+                                reject(
+                                    new Error(
+                                        details,
+                                    ),
                                 );
-
-
                             },
                         );
 
-
+                        stream.once(
+                            "error",
+                            reject,
+                        );
                     },
                 );
-
-
             },
         );
-
     }
-
-
-
-
 
 
     async close():Promise<void>{

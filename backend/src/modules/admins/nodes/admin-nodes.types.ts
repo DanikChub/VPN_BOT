@@ -1,4 +1,17 @@
 import type VpnNode from "../../vpn-nodes/vpn-node.model";
+import type {
+    SyncUsersMode,
+} from "@vpn/common";
+
+export interface SyncNodeUsersDto {
+    mode?: SyncUsersMode;
+}
+
+export interface SyncNodeUsersResponse {
+    nodeId: number;
+    mode: SyncUsersMode;
+    synchronized: true;
+}
 
 
 export interface AdminNodeResponse {

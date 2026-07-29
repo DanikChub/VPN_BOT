@@ -184,7 +184,10 @@ export class XrayApiClient {
                 operationBytes,
             );
 
-
+        console.log({
+            inboundTag,
+            user,
+        });
         try {
             await this.alterInbound(
                 inboundTag,

@@ -64,116 +64,67 @@ export class XrayConfigurator {
                     "warning",
             },
 
-
             api: {
-
-                tag:
-                    "api",
-
-                listen:
-                    "127.0.0.1:10085",
-
+                tag: "api",
+                listen:  "127.0.0.1:10085",
                 services: [
                     "HandlerService",
                     "StatsService",
                 ],
             },
-
-
             stats: {},
-
-
             policy: {
-
                 levels: {
-
                     "0": {
-
                         statsUserUplink:
                             true,
-
                         statsUserDownlink:
                             true,
                     },
                 },
 
-
                 system: {
-
                     statsInboundUplink:
                         true,
-
                     statsInboundDownlink:
                         true,
-
                     statsOutboundUplink:
                         true,
-
                     statsOutboundDownlink:
                         true,
                 },
             },
 
-
-
             inbounds: [
-
                 {
                     tag:
                     options.inboundTag,
-
-
                     listen:
                         "0.0.0.0",
-
-
                     port:
                     options.port,
-
-
                     protocol:
                         "vless",
-
-
                     settings: {
-
                         clients: [],
-
-
                         decryption:
                             "none",
                     },
-
-
                     streamSettings: {
-
                         network:
                             "tcp",
-
-
                         security:
                             "reality",
-
-
                         realitySettings: {
-
                             show:
                                 false,
-
-
                             dest:
                                 `${options.serverName}:443`,
-
-
                             serverNames: [
                                 options.serverName,
                             ],
-
-
                             privateKey:
                             keys.privateKey,
-
-
                             shortIds: [
                                 shortId,
                             ],
@@ -181,37 +132,22 @@ export class XrayConfigurator {
                     },
                 },
             ],
-
-
-
             outbounds: [
-
                 {
-                    protocol:
-                        "freedom",
+                    protocol: "freedom",
                 },
             ],
-
-
-
             routing: {
-
                 domainStrategy:
                     "AsIs",
-
-
                 rules: [
-
                     {
                         type:
                             "field",
 
-
                         inboundTag: [
                             "api",
                         ],
-
-
                         outboundTag:
                             "api",
                     },
@@ -401,10 +337,6 @@ journalctl -u xray -n 100 --no-pager
 
     }
 
-
-
-
-
     private async verifyApi() {
 
 
@@ -432,10 +364,6 @@ journalctl -u xray -n 50 --no-pager
         }
 
     }
-
-
-
-
 
     private extract(
         text: string,

@@ -48,7 +48,7 @@ const NodesPage = () => {
             <PageContent>
 
                 <NodesList
-                    onReady={(refetch) => {
+                    onRefetchReady={(refetch) => {
                         refetchNodes.current = refetch;
                     }}
                 />

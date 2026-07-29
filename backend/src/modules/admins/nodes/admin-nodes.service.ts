@@ -1,4 +1,13 @@
-import VpnNode from "../../vpn-nodes/vpn-node.model";
+import {
+    randomBytes,
+} from "node:crypto";
+
+import type {
+    SyncUsersMode,
+} from "@vpn/common";
+
+import VpnNode
+    from "../../vpn-nodes/vpn-node.model";
 
 import {
     mapNodeToAdminResponse,
@@ -6,19 +15,32 @@ import {
 
 import type {
     CreateNodeDto,
+    SyncNodeUsersResponse,
 } from "./admin-nodes.types";
-import nodeProvisioningService from "../../../provisioning/provisioning.service";
-import {randomBytes} from "node:crypto";
 
+import nodeProvisioningService
+    from "../../../provisioning/provisioning.service";
 
-
+import type {
+    NodeSyncService,
+} from "../../vpn/node-sync.service";
 
 
 class AdminNodesService {
-    async getAll() {
-        const nodes = await VpnNode.findAll({
-            order: [["id", "ASC"]],
-        });
+
+    public constructor(
+        private readonly nodeSyncService:
+            NodeSyncService,
+    ) {}
+
+
+    public async getAll() {
+        const nodes =
+            await VpnNode.findAll({
+                order: [
+                    ["id", "ASC"],
+                ],
+            });
 
         return nodes.map(
             mapNodeToAdminResponse,
@@ -26,12 +48,13 @@ class AdminNodesService {
     }
 
 
-    async getById(
+    public async getById(
         nodeId: number,
     ) {
-        const node = await VpnNode.findByPk(
-            nodeId,
-        );
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+            );
 
         if (!node) {
             return null;
@@ -43,14 +66,14 @@ class AdminNodesService {
     }
 
 
-    async create(
+    public async create(
         dto: CreateNodeDto,
     ) {
-
         let node =
             await VpnNode.findOne({
                 where: {
-                    host: dto.host,
+                    host:
+                    dto.host,
                 },
             });
 
@@ -58,27 +81,51 @@ class AdminNodesService {
             node?.agent_token;
 
         if (!node) {
-            agentToken = randomBytes(32).toString("hex");
-            node = await VpnNode.create({
-                name: dto.name,
-                host: dto.host,
-                port: dto.port,
+            agentToken =
+                randomBytes(32)
+                    .toString("hex");
 
-                ssh_port: dto.sshPort,
-                ssh_user: dto.sshUser,
+            node =
+                await VpnNode.create({
+                    name:
+                    dto.name,
 
-                inbound_tag:
-                    "vless-reality-in",
+                    host:
+                    dto.host,
 
-                is_active: true,
-                status: "offline",
-                install_status: "pending",
+                    port:
+                    dto.port,
 
-                reality_public_key: "",
-                reality_server_name: "",
-                reality_short_id: "",
-                agent_token: agentToken
-            });
+                    ssh_port:
+                    dto.sshPort,
+
+                    ssh_user:
+                    dto.sshUser,
+
+                    inbound_tag:
+                        "vless-reality-in",
+
+                    is_active:
+                        true,
+
+                    status:
+                        "offline",
+
+                    install_status:
+                        "pending",
+
+                    reality_public_key:
+                        "",
+
+                    reality_server_name:
+                        "",
+
+                    reality_short_id:
+                        "",
+
+                    agent_token:
+                    agentToken,
+                });
         }
 
         if (!agentToken) {
@@ -86,33 +133,96 @@ class AdminNodesService {
                 "Node agent token is missing",
             );
         }
+        console.log(process.env.AGENT_CONTROL_SERVER_URL);
+        const provisioningResult =
+            await nodeProvisioningService.install({
+                nodeId:
+                node.id,
 
+                host:
+                dto.host,
 
-        const provisioningResult = await nodeProvisioningService.install({
-            nodeId: node.id,
-            host: dto.host,
-            sshPort: dto.sshPort,
-            sshUser: dto.sshUser,
-            sshPassword: dto.sshPassword,
-            token: agentToken,
-            controlServerUrl:
-                process.env.AGENT_CONTROL_SERVER_URL!,
+                sshPort:
+                dto.sshPort,
 
-        });
+                sshUser:
+                dto.sshUser,
+
+                sshPassword:
+                dto.sshPassword,
+
+                token:
+                agentToken,
+
+                controlServerUrl:
+                    process.env.AGENT_CONTROL_SERVER_URL!,
+            });
 
         await node.update({
-            reality_public_key: provisioningResult.realityPublicKey,
-            reality_short_id: provisioningResult.realityShortId,
-            reality_server_name: provisioningResult.serverName,
-            port: provisioningResult.port,
-            inbound_tag: provisioningResult.inboundTag,
+            reality_public_key:
+            provisioningResult
+                .realityPublicKey,
+
+            reality_short_id:
+            provisioningResult
+                .realityShortId,
+
+            reality_server_name:
+            provisioningResult
+                .serverName,
+
+            port:
+            provisioningResult.port,
+
+            inbound_tag:
+            provisioningResult
+                .inboundTag,
         });
 
         return mapNodeToAdminResponse(
             node,
         );
     }
+
+
+    public async syncUsers(
+        nodeId: number,
+        mode: SyncUsersMode,
+    ): Promise<SyncNodeUsersResponse | null> {
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+            );
+
+        if (!node) {
+            return null;
+        }
+
+        if (
+            node.status !==
+            "online"
+        ) {
+            throw new Error(
+                "Node agent is offline",
+            );
+        }
+
+        await this.nodeSyncService.syncNode(
+            node,
+            mode,
+        );
+
+        return {
+            nodeId:
+            node.id,
+
+            mode,
+
+            synchronized:
+                true,
+        };
+    }
 }
 
 
-export default new AdminNodesService();
+export default AdminNodesService;

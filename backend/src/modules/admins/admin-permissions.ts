@@ -18,6 +18,7 @@ export const adminPermissions = [
     "nodes.create",
     "nodes.update",
     "nodes.delete",
+    "nodes.sync",
 
     "admins.read",
     "admins.create",
@@ -51,6 +52,7 @@ const rolePermissions: Record<
         "nodes.read",
         "nodes.create",
         "nodes.update",
+        "nodes.sync",
     ],
 
     support: [

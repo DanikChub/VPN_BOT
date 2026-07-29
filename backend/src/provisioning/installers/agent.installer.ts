@@ -126,7 +126,7 @@ rm -f /tmp/vpn-node-agent.tar.gz
     private async configure(
         options:InstallAgentOptions,
     ):Promise<void>{
-
+        console.log(`[AGENT INSTALLER] CONTROL_SERVER_URL=${options.controlServerUrl}`)
 
         await this.ssh.exec(`
 set -e
