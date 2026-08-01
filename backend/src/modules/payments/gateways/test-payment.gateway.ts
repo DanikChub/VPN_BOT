@@ -2,8 +2,19 @@ import {
     CheckPaymentResult,
     CreatePaymentInput,
     CreatePaymentResult,
-    PaymentGateway
+    GatewayWebhookInput,
+    GatewayWebhookResult,
+    PaymentGateway,
 } from "../payment-gateway.interface";
+
+
+interface TestPaymentWebhookBody {
+    event?: unknown;
+
+    paymentId?: unknown;
+
+    externalPaymentId?: unknown;
+}
 
 
 class TestPaymentGateway
@@ -30,7 +41,6 @@ class TestPaymentGateway
     async createPayment(
         input: CreatePaymentInput
     ): Promise<CreatePaymentResult> {
-
         this.ensureEnabled();
 
 
@@ -47,7 +57,6 @@ class TestPaymentGateway
     async checkPayment(
         externalPaymentId: string
     ): Promise<CheckPaymentResult> {
-
         this.ensureEnabled();
 
 
@@ -62,11 +71,137 @@ class TestPaymentGateway
         }
 
 
+        const paymentId =
+            Number(
+                externalPaymentId.replace(
+                    "test_",
+                    ""
+                )
+            );
+
+
+        if (
+            !Number.isInteger(paymentId) ||
+            paymentId <= 0
+        ) {
+            throw new Error(
+                "Invalid payment ID in test payment identifier"
+            );
+        }
+
+
+        /*
+         * Тестовый gateway всегда подтверждает
+         * корректно созданный тестовый платёж.
+         */
         return {
             externalPaymentId,
 
             status:
                 "paid",
+        };
+    }
+
+
+    async parseWebhook(
+        input: GatewayWebhookInput
+    ): Promise<GatewayWebhookResult> {
+        this.ensureEnabled();
+
+
+        if (
+            !input.body ||
+            typeof input.body !==
+            "object" ||
+            Array.isArray(input.body)
+        ) {
+            throw new Error(
+                "Invalid test webhook body"
+            );
+        }
+
+
+        const body =
+            input.body as TestPaymentWebhookBody;
+
+
+        if (
+            typeof body.event !==
+            "string"
+        ) {
+            throw new Error(
+                "Test webhook event is missing"
+            );
+        }
+
+
+        /*
+         * События, которые webhook-контроллер
+         * должен принять, но не обрабатывать.
+         */
+        if (
+            body.event !==
+            "payment.paid"
+        ) {
+            return {
+                handled:
+                    false,
+
+                paymentId:
+                    null,
+
+                externalPaymentId:
+                    null,
+            };
+        }
+
+
+        const paymentId =
+            Number(
+                body.paymentId
+            );
+
+
+        if (
+            !Number.isInteger(paymentId) ||
+            paymentId <= 0
+        ) {
+            throw new Error(
+                "Invalid paymentId in test webhook"
+            );
+        }
+
+
+        const expectedExternalPaymentId =
+            `test_${paymentId}`;
+
+
+        const externalPaymentId =
+            body.externalPaymentId ===
+            undefined
+                ? expectedExternalPaymentId
+                : String(
+                    body.externalPaymentId
+                );
+
+
+        if (
+            externalPaymentId !==
+            expectedExternalPaymentId
+        ) {
+            throw new Error(
+                "Test webhook external payment ID mismatch"
+            );
+        }
+
+
+        return {
+            handled:
+                true,
+
+            paymentId,
+
+            externalPaymentId,
         };
     }
 }

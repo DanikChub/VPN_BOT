@@ -17,6 +17,14 @@ import paymentGatewayRegistry from "./payment-gateway.registry";
 import Subscription from "../subscriptions/subscription.model";
 import vpnCredentialService from "../vpn/vpn-credential.service";
 
+interface ProcessPaymentWebhookInput {
+    code: string;
+
+    paymentId: number;
+
+    externalPaymentId: string | null;
+}
+
 
 class PaymentService {
 
@@ -556,6 +564,72 @@ class PaymentService {
             subscriptionUrl:
                 `${publicApiUrl}/sub/${credential.subscription_token}`,
         };
+    }
+
+    async processWebhook(
+        input: ProcessPaymentWebhookInput
+    ) {
+        const payment =
+            await Payment.findByPk(
+                input.paymentId,
+            );
+
+        if (!payment) {
+            throw new Error(
+                `Payment ${input.paymentId} not found`
+            );
+        }
+
+        const paymentMethod =  await PaymentMethod.findByPk(
+            payment?.payment_method_id
+        )
+
+        if (!paymentMethod) {
+            throw new Error(
+                "Payment method is missing"
+            );
+        }
+
+
+        /*
+         * Не позволяем событию Crypto Pay
+         * подтвердить платёж другого gateway.
+         */
+        if (
+            paymentMethod.code !==
+            input.code
+        ) {
+            throw new Error(
+                "Webhook gateway does not match payment gateway"
+            );
+        }
+
+
+        /*
+         * Проверяем, что provider invoice
+         * совпадает с сохранённым.
+         */
+        if (
+            input.externalPaymentId &&
+            payment.provider_payment_id !==
+            input.externalPaymentId
+        ) {
+            throw new Error(
+                "Webhook external payment ID mismatch"
+            );
+        }
+
+
+        /*
+         * Ключевой момент:
+         *
+         * webhook только инициирует проверку.
+         * Окончательное подтверждение делает
+         * стандартный check().
+         */
+        return this.check(
+            input.paymentId
+        );
     }
 }
 

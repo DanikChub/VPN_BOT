@@ -123,6 +123,20 @@ class VpnNodeService {
 
     }
 
+    public async findAvailableNodes(): Promise<VpnNode[]> {
+
+        return VpnNode.findAll({
+            where: {
+                is_active: true,
+                status: "online",
+            },
+
+            order: [
+                ["id", "ASC"],
+            ],
+        });
+    }
+
 }
 
 

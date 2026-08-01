@@ -14,6 +14,18 @@ import VpnNode
 
 import vlessUrlService
     from "./vless-url.service";
+import {readFileSync} from "node:fs";
+import path from "node:path";
+
+
+const instructionPageTemplate =
+    readFileSync(
+        path.join(
+            __dirname,
+            "instruction-page.html",
+        ),
+        "utf8",
+    );
 
 
 class VpnSubscriptionController {
@@ -89,12 +101,83 @@ class VpnSubscriptionController {
             );
 
 
+        const accept =
+            req.headers.accept ?? "";
+
+        const userAgent =
+            req.headers["user-agent"] ?? "";
+
+        const isHapp =
+            userAgent
+                .toLowerCase()
+                .includes("happ");
+
+        const wantsHtml =
+            !isHapp &&
+            accept.includes("text/html");
+
+        if (wantsHtml) {
+            const subscriptionUrl =
+                `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+
+            res
+                .status(200)
+                .type("html")
+                .send(
+                    this.renderInstructionPage({
+                        subscriptionUrl,
+                    }),
+                );
+
+            return;
+        }
+
         res
-            .type("text/plain; charset=utf-8")
+            .status(200)
+            .set({
+                "Content-Type":
+                    "text/plain; charset=utf-8",
+
+                "Cache-Control":
+                    "no-store",
+            })
             .send(
-                links.join("\n")
+                links.join("\n"),
             );
     }
+
+
+
+    private renderInstructionPage(
+        input: {
+            subscriptionUrl: string;
+        },
+    ): string {
+        return instructionPageTemplate
+            .replaceAll(
+                "{{SUBSCRIPTION_URL}}",
+                this.escapeHtml(
+                    input.subscriptionUrl,
+                ),
+            )
+            .replaceAll(
+                "{{SUBSCRIPTION_URL_JS}}",
+                JSON.stringify(
+                    input.subscriptionUrl,
+                ).slice(1, -1));
+    }
+
+    private escapeHtml(
+        value: string,
+    ): string {
+        return value
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
 }
 
 

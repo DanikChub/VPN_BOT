@@ -1,4 +1,7 @@
 import type {
+    AddUsersCommandResult,
+    RemoveUsersCommandResult,
+    SyncUsersCommandResult,
     SyncUsersMode,
 } from "@vpn/common";
 
@@ -39,7 +42,8 @@ class AgentNodeControlService
     public async addUser(
         node: VpnNode,
         credential: VpnCredential,
-    ): Promise<void> {
+    ): Promise<AddUsersCommandResult> {
+
         const command =
             new AddUsersCommand({
                 inboundTag:
@@ -61,7 +65,8 @@ class AgentNodeControlService
                 ],
             });
 
-        await this.commandBus.execute(
+
+        return this.commandBus.execute(
             node.id,
             command,
         );
@@ -70,7 +75,8 @@ class AgentNodeControlService
     public async removeUser(
         node: VpnNode,
         credential: VpnCredential,
-    ): Promise<void> {
+    ): Promise<RemoveUsersCommandResult> {
+
         const command =
             new RemoveUsersCommand({
                 inboundTag:
@@ -83,7 +89,8 @@ class AgentNodeControlService
                 ],
             });
 
-        await this.commandBus.execute(
+
+        return this.commandBus.execute(
             node.id,
             command,
         );
@@ -93,7 +100,8 @@ class AgentNodeControlService
         node: VpnNode,
         credentials: VpnCredential[],
         mode: SyncUsersMode = "reconcile",
-    ): Promise<void> {
+    ): Promise<SyncUsersCommandResult> {
+
         const command =
             new SyncUsersCommand({
                 inboundTag:
@@ -118,7 +126,8 @@ class AgentNodeControlService
                     ),
             });
 
-        await this.commandBus.execute(
+
+        return this.commandBus.execute(
             node.id,
             command,
         );

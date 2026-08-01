@@ -4,6 +4,7 @@ import {
 
 import paymentController
     from "./payment.controller";
+import paymentWebhookController from "./payment.webhook.controller";
 
 
 const paymentRouter =
@@ -17,6 +18,11 @@ paymentRouter.post(
     )
 );
 
+paymentRouter.post(
+    "/webhooks/:code",
+    paymentWebhookController.handle
+);
+
 
 paymentRouter.post(
     "/:paymentId/check",
@@ -24,6 +30,8 @@ paymentRouter.post(
         paymentController
     )
 );
+
+
 
 
 export default paymentRouter;

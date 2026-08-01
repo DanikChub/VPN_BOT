@@ -9,6 +9,7 @@ import VpnNode from "../../../modules/vpn-nodes/vpn-node.model";
 import {NodeRegistry} from "../connection/node-registry";
 import {AgentMessageContext} from "../transport/message-router";
 import {AgentMessageSender} from "../transport/message-sender";
+import {nodeSyncService} from "../../container";
 
 
 
@@ -94,6 +95,7 @@ export class HelloHandler {
             last_seen_at: new Date(),
         });
 
+
         this.sender.send(
             socket,
             {
@@ -113,6 +115,7 @@ export class HelloHandler {
             },
         );
 
+
         console.log(
             [
                 "Node authenticated:",
@@ -123,5 +126,9 @@ export class HelloHandler {
             ]
                 .join(" ")
         );
+
+        setTimeout(() => {
+            void nodeSyncService.syncNode(node, "rebuild");
+        }, 0);
     };
 }

@@ -1,22 +1,25 @@
 import {
     AgentCommandType,
+    type CommandResultMessage,
 } from "@vpn/common";
 
 
-export function assertCommandSucceeded(
-    message: {
-        payload: unknown;
-    },
+export function getSuccessfulCommandData<TResult>(
+    message: CommandResultMessage<TResult>,
     command: AgentCommandType,
     nodeId: number,
-): void {
+): TResult {
+
+    const payload =
+        message.payload;
+
 
     if (
-        typeof message.payload !==
+        typeof payload !==
         "object" ||
-        message.payload === null ||
+        payload === null ||
         Array.isArray(
-            message.payload,
+            payload,
         )
     ) {
         throw new Error(
@@ -25,17 +28,22 @@ export function assertCommandSucceeded(
     }
 
 
-    const payload =
-        message.payload as Record<
-            string,
-            unknown
-        >;
-
-
     if (
-        payload.success === true
+        payload.success ===
+        true
     ) {
-        return;
+        if (
+            !(
+                "data" in
+                payload
+            )
+        ) {
+            throw new Error(
+                `Node ${nodeId} returned success without data for "${command}"`,
+            );
+        }
+
+        return payload.data;
     }
 
 
@@ -44,13 +52,8 @@ export function assertCommandSucceeded(
 
 
     if (
-        typeof payload.error ===
-        "string"
-    ) {
-        errorMessage =
-            payload.error;
-
-    } else if (
+        "error" in
+        payload &&
         typeof payload.error ===
         "object" &&
         payload.error !== null &&
@@ -58,7 +61,6 @@ export function assertCommandSucceeded(
             payload.error,
         )
     ) {
-
         const error =
             payload.error as Record<
                 string,
@@ -68,7 +70,8 @@ export function assertCommandSucceeded(
 
         if (
             typeof error.message ===
-            "string"
+            "string" &&
+            error.message.trim()
         ) {
             errorMessage =
                 error.message;

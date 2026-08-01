@@ -1,81 +1,139 @@
-import { Op } from "sequelize";
+import type {
+    NodeSyncService,
+} from "../modules/vpn/node-sync.service";
 
-import Subscription from "../modules/subscriptions/subscription.model";
-import VpnCredential from "../modules/vpn/vpn-credential.model";
+import subscriptionService
+    from "../modules/subscriptions/subscription.service";
 
-import {
-    vpnAccessService,
-} from "../infrastructure/container";
 
 class SubscriptionExpirationJob {
+
     private isRunning =
         false;
 
+    private syncPending =
+        false;
+
+
+    public constructor(
+        private readonly nodeSyncService:
+        NodeSyncService,
+    ) {}
+
+
     public async run():
         Promise<void> {
+
+
         if (this.isRunning) {
             return;
         }
 
+
         this.isRunning =
             true;
 
+
         try {
-            const subscriptions =
-                await Subscription.findAll({
-                    where: {
-                        status:
-                            "active",
+            const expiredCount =
+                await subscriptionService
+                    .expireOverdue();
 
-                        expires_at: {
-                            [Op.lte]:
-                                new Date(),
-                        },
+
+            if (expiredCount > 0) {
+                this.syncPending =
+                    true;
+
+
+                console.log(
+                    "[SUBSCRIPTIONS_JOB] Subscriptions expired",
+                    {
+                        expiredCount,
                     },
-                });
-
-            for (
-                const subscription of
-                subscriptions
-                ) {
-                try {
-                    const credential =
-                        await VpnCredential.findOne({
-                            where: {
-                                user_id:
-                                subscription.user_id,
-                            },
-                        });
-
-                    if (!credential) {
-                        console.error(
-                            `[SUBSCRIPTIONS] Credential not found for user ${subscription.user_id}`,
-                        );
-
-                        continue;
-                    }
-
-                    await vpnAccessService.revoke(
-                        credential,
-                    );
-
-                    subscription.status =
-                        "expired";
-
-                    await subscription.save();
-
-                    console.log(
-                        `[SUBSCRIPTIONS] User ${subscription.user_id} expired`,
-                    );
-                } catch (error) {
-                    console.error(
-                        `[SUBSCRIPTIONS] Failed to expire user ${subscription.user_id}:`,
-                        error instanceof Error
-                            ? error.message
-                            : error,
-                    );
-                }
+                );
             }
+
+
+            if (!this.syncPending) {
+                return;
+            }
+
+
+            console.log(
+                "[SUBSCRIPTIONS_JOB] Starting nodes synchronization",
+                {
+                    reason:
+                        "subscription-expiration",
+                },
+            );
+
+
+            const startedAt =
+                Date.now();
+
+
+            /*
+             * ВАЖНО: здесь должны быть скобки.
+             */
+            const result =
+                await this.nodeSyncService
+                    .syncAllNodes(
+                        "reconcile",
+                    );
+
+
+            console.log(
+                "[SUBSCRIPTIONS_JOB] Nodes synchronization completed",
+                {
+                    reason:
+                        "subscription-expiration",
+
+                    synchronizedNodeIds:
+                    result.synchronizedNodeIds,
+
+                    failedNodeIds:
+                    result.failedNodeIds,
+
+                    durationMs:
+                        Date.now() -
+                        startedAt,
+                },
+            );
+
+
+            if (
+                result.failedNodeIds.length > 0
+            ) {
+                throw new Error(
+                    `Failed to synchronize nodes: ${result.failedNodeIds.join(", ")}`,
+                );
+            }
+
+
+            this.syncPending =
+                false;
+        } catch (error) {
+            console.error(
+                "[SUBSCRIPTIONS_JOB] Failed",
+                {
+                    syncPending:
+                    this.syncPending,
+
+                    error:
+                        error instanceof Error
+                            ? {
+                                name:
+                                error.name,
+
+                                message:
+                                error.message,
+
+                                stack:
+                                error.stack,
+                            }
+                            : error,
+                },
+            );
         } finally {
             this.isRunning =
                 false;
@@ -83,4 +141,5 @@ class SubscriptionExpirationJob {
     }
 }
 
-export default new SubscriptionExpirationJob();
+
+export default SubscriptionExpirationJob;

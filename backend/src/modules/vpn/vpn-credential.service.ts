@@ -7,6 +7,7 @@ import {
 
 import User from "../users/user.model";
 import VpnCredential from "./vpn-credential.model";
+import Subscription from "../subscriptions/subscription.model";
 
 class VpnCredentialService {
     async get(
@@ -94,6 +95,43 @@ class VpnCredentialService {
 
             throw error;
         }
+    }
+
+    public async findAllActive():
+        Promise<VpnCredential[]> {
+
+        return VpnCredential.findAll({
+            include: [
+                {
+                    model:
+                    User,
+
+                    as:
+                        "user",
+
+                    required:
+                        true,
+
+                    include: [
+                        {
+                            model:
+                            Subscription,
+
+                            as:
+                                "subscription",
+
+                            required:
+                                true,
+
+                            where: {
+                                status:
+                                    "active",
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
     }
 }
 

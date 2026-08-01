@@ -38,6 +38,8 @@ export class SyncUsersHandler {
                 args.inboundTag,
             );
 
+        console.log(knownEmails);
+
         const result =
             await this.xrayUserService.syncUsers({
                 inboundTag:

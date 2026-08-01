@@ -2,18 +2,36 @@ import { MessageType } from "./message-type.js";
 import type { ProtocolMessage } from "./message.js";
 import type {SyncUsersMode} from "./command.js";
 
-export interface CommandResultPayload {
-    success: boolean;
-    data?: unknown;
-    error?: {
+export interface SuccessfulCommandResultPayload<
+    TResult,
+> {
+    success: true;
+
+    data: TResult;
+}
+
+
+export interface FailedCommandResultPayload {
+    success: false;
+
+    error: {
         code: string;
         message: string;
     };
 }
 
-export type CommandResultMessage = ProtocolMessage<
+
+export type CommandResultPayload<
+    TResult = unknown,
+> =
+    | SuccessfulCommandResultPayload<TResult>
+    | FailedCommandResultPayload;
+
+export type CommandResultMessage<
+    TResult = unknown,
+> = ProtocolMessage<
     MessageType.COMMAND_RESULT,
-    CommandResultPayload
+    CommandResultPayload<TResult>
 >;
 
 export interface AddUsersCommandResult {

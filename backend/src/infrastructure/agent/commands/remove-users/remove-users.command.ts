@@ -18,37 +18,24 @@ interface RemoveUsersCommandInput {
 
 
 export class RemoveUsersCommand
-    implements AgentCommand<RemoveUsersCommandArguments>
+    implements AgentCommand<
+        AgentCommandType.REMOVE_USERS
+    >
 {
 
     public readonly type =
         AgentCommandType.REMOVE_USERS;
 
 
-    private readonly arguments:
-        RemoveUsersCommandArguments;
-
-
-    constructor(
-        input: RemoveUsersCommandInput,
-    ) {
-
-        this.arguments = {
-            inboundTag:
-            input.inboundTag,
-
-            emails:
-            input.emails,
-        };
-
-    }
+    public constructor(
+        private readonly args:
+        RemoveUsersCommandArguments,
+    ) {}
 
 
     public getArguments():
         RemoveUsersCommandArguments {
 
-        return this.arguments;
-
+        return this.args;
     }
-
 }

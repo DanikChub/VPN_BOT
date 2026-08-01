@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <meta
+            name="theme-color"
+            content="#073b68"
+    >
+
+    <title>Подключение — ВПН ИОРДАН</title>
+
+    <style>
+        :root {
+            --blue-dark: #062f55;
+            --blue: #0877ba;
+            --blue-light: #33b9e8;
+            --cyan: #7de5f4;
+
+            --text: #10283c;
+            --muted: #698094;
+
+            --background: #eaf6fb;
+            --card: rgba(255, 255, 255, 0.94);
+
+            --border: rgba(8, 119, 186, 0.14);
+            --shadow: 0 24px 70px rgba(3, 54, 90, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+
+            font-family:
+                    Inter,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+
+            color: var(--text);
+
+            background:
+                    radial-gradient(
+                            circle at 15% 0%,
+                            rgba(68, 195, 232, 0.38),
+                            transparent 30%
+                    ),
+                    radial-gradient(
+                            circle at 90% 15%,
+                            rgba(15, 112, 178, 0.24),
+                            transparent 28%
+                    ),
+                    linear-gradient(
+                            160deg,
+                            #dff4fb 0%,
+                            #edf8fc 42%,
+                            #dceff7 100%
+                    );
+
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            padding:
+                    max(22px, env(safe-area-inset-top))
+                    14px
+                    max(22px, env(safe-area-inset-bottom));
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .card {
+            overflow: hidden;
+
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .hero {
+            position: relative;
+            min-height: 245px;
+
+            padding: 30px 26px 92px;
+
+            color: white;
+            text-align: center;
+
+            background:
+                    radial-gradient(
+                            circle at 50% 20%,
+                            rgba(126, 229, 244, 0.38),
+                            transparent 30%
+                    ),
+                    linear-gradient(
+                            145deg,
+                            #052f55 0%,
+                            #076ba7 48%,
+                            #24afd5 100%
+                    );
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            opacity: 0.28;
+
+            background-image:
+                    linear-gradient(
+                            rgba(255, 255, 255, 0.12) 1px,
+                            transparent 1px
+                    ),
+                    linear-gradient(
+                            90deg,
+                            rgba(255, 255, 255, 0.12) 1px,
+                            transparent 1px
+                    );
+
+            background-size: 34px 34px;
+
+            mask-image:
+                    linear-gradient(
+                            to bottom,
+                            black,
+                            transparent 85%
+                    );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            width: 88px;
+            height: 88px;
+
+            margin: 0 auto 14px;
+
+            display: grid;
+            place-items: center;
+
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+
+            background:
+                    linear-gradient(
+                            160deg,
+                            rgba(255, 255, 255, 0.97),
+                            rgba(215, 246, 252, 0.93)
+                    );
+
+            box-shadow:
+                    0 12px 32px rgba(0, 30, 55, 0.32),
+                    inset 0 0 0 6px rgba(13, 135, 190, 0.1);
+        }
+
+        .logo svg {
+            width: 62px;
+            height: 62px;
+        }
+
+        .brand {
+            margin: 0;
+
+            font-size: clamp(30px, 8vw, 42px);
+            font-weight: 900;
+            letter-spacing: -1.4px;
+            line-height: 1;
+        }
+
+        .brand span {
+            color: #9df1fa;
+        }
+
+        .tagline {
+            margin: 12px 0 0;
+
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .waves {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+
+            height: 78px;
+        }
+
+        .content {
+            position: relative;
+            z-index: 3;
+
+            margin-top: -44px;
+            padding: 0 24px 28px;
+        }
+
+        .intro {
+            margin-bottom: 26px;
+            padding: 22px 20px;
+
+            text-align: center;
+
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            box-shadow: 0 14px 35px rgba(6, 63, 101, 0.11);
+        }
+
+        .intro h1 {
+            margin: 0 0 7px;
+
+            font-size: 23px;
+            line-height: 1.2;
+        }
+
+        .intro p {
+            margin: 0;
+
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .step {
+            margin-top: 24px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            flex: 0 0 auto;
+
+            width: 32px;
+            height: 32px;
+
+            display: grid;
+            place-items: center;
+
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 800;
+
+            background: #dff4fb;
+            border: 1px solid rgba(8, 119, 186, 0.12);
+            border-radius: 50%;
+        }
+
+        .step-title {
+            margin: 0;
+
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .button {
+            width: 100%;
+            min-height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            padding: 14px 18px;
+
+            border: 0;
+            border-radius: 16px;
+
+            text-decoration: none;
+            cursor: pointer;
+
+            transition:
+                    transform 160ms ease,
+                    box-shadow 160ms ease,
+                    opacity 160ms ease;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .button-primary {
+            color: white;
+            font-weight: 800;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0877ba,
+                            #19a8d2
+                    );
+
+            box-shadow:
+                    0 12px 24px rgba(8, 119, 186, 0.27);
+        }
+
+        .button-primary:hover {
+            box-shadow:
+                    0 15px 30px rgba(8, 119, 186, 0.35);
+        }
+
+        .button-secondary {
+            color: var(--blue-dark);
+            font-weight: 750;
+
+            background: #edf7fb;
+            border: 1px solid rgba(8, 119, 186, 0.12);
+        }
+
+        .button-icon {
+            width: 21px;
+            height: 21px;
+
+            flex: 0 0 auto;
+        }
+
+        .subscription-box {
+            padding: 8px;
+
+            display: flex;
+            gap: 8px;
+
+            background: #f3f8fb;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .subscription-url {
+            min-width: 0;
+            flex: 1;
+
+            padding: 10px 8px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+            color: #385267;
+            font-size: 13px;
+            line-height: 24px;
+        }
+
+        .copy-button {
+            flex: 0 0 auto;
+
+            min-width: 102px;
+
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+
+            background: var(--blue-dark);
+            border: 0;
+            border-radius: 11px;
+            cursor: pointer;
+        }
+
+        .copy-button.success {
+            background: #16855d;
+        }
+
+        .notice {
+            margin-top: 12px;
+            padding: 13px 15px;
+
+            display: flex;
+            gap: 10px;
+
+            color: #765417;
+            font-size: 13px;
+            line-height: 1.45;
+
+            background: #fff9e9;
+            border: 1px solid #f0d57a;
+            border-radius: 14px;
+        }
+
+        .notice-icon {
+            flex: 0 0 auto;
+            font-size: 18px;
+        }
+
+        .app-button {
+            margin-top: 4px;
+            min-height: 62px;
+
+            font-size: 16px;
+        }
+
+        .hint {
+            margin: 10px 3px 0;
+
+            color: #8294a3;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .support {
+            margin-top: 28px;
+
+            text-align: center;
+        }
+
+        .support a {
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 650;
+            text-decoration: none;
+        }
+
+        .footer {
+            margin-top: 18px;
+
+            color: #8194a3;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: max(24px, env(safe-area-inset-bottom));
+
+            z-index: 50;
+
+            padding: 12px 18px;
+
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+
+            background: rgba(5, 40, 65, 0.94);
+            border-radius: 999px;
+
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+
+            opacity: 0;
+            pointer-events: none;
+
+            transform: translate(-50%, 20px);
+
+            transition:
+                    opacity 180ms ease,
+                    transform 180ms ease;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @media (max-width: 430px) {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .page {
+                max-width: none;
+            }
+
+            .card {
+                min-height: 100vh;
+
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .hero {
+                min-height: 235px;
+                padding-top: 26px;
+            }
+
+            .content {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .download-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<main class="page">
+    <section class="card">
+        <header class="hero">
+            <div class="hero-content">
+                <div class="logo" aria-hidden="true">
+                    <svg
+                            viewBox="0 0 100 100"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                                d="M50 8L75 18V43C75 63 64 78 50 87C36 78 25 63 25 43V18L50 8Z"
+                                fill="#0877BA"
+                        />
+
+                        <path
+                                d="M36 37C46 30 59 30 68 36"
+                                stroke="white"
+                                stroke-width="6"
+                                stroke-linecap="round"
+                        />
+
+                        <path
+                                d="M33 51C43 43 56 43 67 49"
+                                stroke="#93ECF5"
+                                stroke-width="6"
+                                stroke-linecap="round"
+                        />
+
+                        <path
+                                d="M36 64C45 57 56 57 64 61"
+                                stroke="white"
+                                stroke-width="6"
+                                stroke-linecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <p class="brand">
+                    ВПН <span>ИОРДАН</span>
+                </p>
+
+                <p class="tagline">
+                    Безопасный доступ к интернету<br>
+                    без сложных настроек
+                </p>
+            </div>
+
+            <svg
+                    class="waves"
+                    viewBox="0 0 1440 150"
+                    preserveAspectRatio="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+            >
+                <path
+                        d="M0 64L60 72C120 80 240 96 360 91C480 85 600 59 720 54C840 48 960 64 1080 75C1200 85 1320 91 1380 93L1440 96V150H0Z"
+                        fill="rgba(255,255,255,0.38)"
+                />
+
+                <path
+                        d="M0 91L60 85C120 80 240 69 360 75C480 80 600 101 720 107C840 112 960 101 1080 91C1200 80 1320 69 1380 64L1440 59V150H0Z"
+                        fill="rgba(255,255,255,0.58)"
+                />
+
+                <path
+                        d="M0 112L80 105C160 99 320 85 480 91C640 96 800 123 960 128C1120 133 1280 117 1360 109L1440 101V150H0Z"
+                        fill="#ffffff"
+                />
+            </svg>
+        </header>
+
+        <div class="content">
+            <section class="intro">
+                <h1>Подключение VPN</h1>
+
+                <p>
+                    Установите Happ и добавьте подписку.
+                    Обычно это занимает меньше минуты.
+                </p>
+            </section>
+
+            <section class="step">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+
+                    <h2 class="step-title">
+                        Установите приложение
+                    </h2>
+                </div>
+
+                <div class="download-grid">
+                    <a
+                            class="button button-primary"
+                            href="https://github.com/Happ-proxy/happ-desktop/releases/latest"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                    >
+                        <svg
+                                class="button-icon"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                        >
+                            <path d="M3 5.5L10.5 4.4V11H3V5.5ZM11.5 4.25L21 2.9V11H11.5V4.25ZM3 12H10.5V18.6L3 17.5V12ZM11.5 12H21V21.1L11.5 19.75V12Z"/>
+                        </svg>
+
+                        Windows
+                    </a>
+
+                    <a
+                            class="button button-secondary"
+                            href="https://www.happ.su/main/ru"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                    >
+                        📱 Другие устройства
+                    </a>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+
+                    <h2 class="step-title">
+                        Ваша ссылка подписки
+                    </h2>
+                </div>
+
+                <div class="subscription-box">
+                    <div
+                            id="subscriptionUrl"
+                            class="subscription-url"
+                            title="{{SUBSCRIPTION_URL}}"
+                    >
+                        {{SUBSCRIPTION_URL}}
+                    </div>
+
+                    <button
+                            id="copyButton"
+                            class="copy-button"
+                            type="button"
+                    >
+                        Копировать
+                    </button>
+                </div>
+
+                <div class="notice">
+                    <span class="notice-icon">💡</span>
+
+                    <span>
+                            Ссылка персональная. Не отправляйте её другим людям.
+                        </span>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+
+                    <h2 class="step-title">
+                        Добавьте подписку в Happ
+                    </h2>
+                </div>
+
+                <button
+                        id="openHappButton"
+                        class="button button-primary app-button"
+                        type="button"
+                >
+                    <svg
+                            class="button-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                    >
+                        <path d="M12 3V15"/>
+                        <path d="M7 10L12 15L17 10"/>
+                        <path d="M5 19H19"/>
+                    </svg>
+
+                    Скопировать и открыть Happ
+                </button>
+
+                <p class="hint">
+                    В Happ нажмите «+», выберите добавление подписки
+                    по URL и вставьте скопированную ссылку.
+                </p>
+            </section>
+
+            <div class="support">
+                <a href="https://t.me/YOUR_SUPPORT_USERNAME">
+                    🎧 Нужна помощь? Написать в поддержку
+                </a>
+            </div>
+
+            <footer class="footer">
+                ВПН ИОРДАН · Безопасно. Быстро. Просто.
+            </footer>
+        </div>
+    </section>
+</main>
+
+<div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+>
+    Ссылка скопирована
+</div>
+
+<script>
+    const subscriptionUrl =
+        "{{SUBSCRIPTION_URL_JS}}";
+
+    const copyButton =
+        document.getElementById(
+            "copyButton"
+        );
+
+    const openHappButton =
+        document.getElementById(
+            "openHappButton"
+        );
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    async function copySubscriptionUrl() {
+        try {
+            await navigator.clipboard.writeText(
+                subscriptionUrl
+            );
+        } catch {
+            const textarea =
+                document.createElement(
+                    "textarea"
+                );
+
+            textarea.value =
+                subscriptionUrl;
+
+            textarea.style.position =
+                "fixed";
+
+            textarea.style.opacity =
+                "0";
+
+            document.body.appendChild(
+                textarea
+            );
+
+            textarea.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            textarea.remove();
+        }
+
+
+        copyButton.textContent =
+            "Скопировано";
+
+        copyButton.classList.add(
+            "success"
+        );
+
+        toast.classList.add(
+            "visible"
+        );
+
+
+        window.setTimeout(
+            () => {
+                copyButton.textContent =
+                    "Копировать";
+
+                copyButton.classList.remove(
+                    "success"
+                );
+
+                toast.classList.remove(
+                    "visible"
+                );
+            },
+            2200
+        );
+    }
+
+
+    copyButton.addEventListener(
+        "click",
+        copySubscriptionUrl
+    );
+
+
+    openHappButton.addEventListener(
+        "click",
+        async () => {
+            await copySubscriptionUrl();
+
+            /*
+             * Пытаемся открыть установленное приложение.
+             * Ссылка уже находится в буфере обмена.
+             */
+            window.location.href =
+                `happ://add/${subscriptionUrl}`;
+        }
+    );
+</script>
+</body>
+</html>

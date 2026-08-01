@@ -26,6 +26,45 @@ export interface CheckPaymentResult {
     status: GatewayPaymentStatus;
 }
 
+export interface CheckPaymentResult {
+    externalPaymentId: string;
+
+    status: GatewayPaymentStatus;
+}
+
+export interface GatewayWebhookInput {
+    headers: Record<
+        string,
+        string | string[] | undefined
+    >;
+
+    body: unknown;
+
+    rawBody?: Buffer;
+}
+
+export interface GatewayWebhookResult {
+    /**
+     * Провайдер мог прислать событие,
+     * которое нас не интересует.
+     */
+    handled: boolean;
+
+    /**
+     * Внутренний Payment.id.
+     *
+     * null — если событие не связано
+     * с конкретным платежом.
+     */
+    paymentId: number | null;
+
+    /**
+     * Внешний идентификатор нужен
+     * для дополнительной сверки.
+     */
+    externalPaymentId: string | null;
+}
+
 export interface PaymentGateway {
     readonly name: string;
 
@@ -36,4 +75,8 @@ export interface PaymentGateway {
     checkPayment(
         externalPaymentId: string
     ): Promise<CheckPaymentResult>;
+
+    parseWebhook?(
+        input: GatewayWebhookInput
+    ): Promise<GatewayWebhookResult>;
 }

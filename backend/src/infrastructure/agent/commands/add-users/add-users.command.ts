@@ -1,6 +1,9 @@
 import {
     AgentCommandType,
-    type AddUsersCommandArguments,
+} from "@vpn/common";
+
+import type {
+    AddUsersCommandArguments,
 } from "@vpn/common";
 
 import type {
@@ -8,45 +11,24 @@ import type {
 } from "../agent-command.interface";
 
 
-interface AddUsersCommandInput {
-    inboundTag: string;
-
-    users: AddUsersCommandArguments["users"];
-}
-
-
 export class AddUsersCommand
-    implements AgentCommand<AddUsersCommandArguments>
-{
+    implements AgentCommand<
+        AgentCommandType.ADD_USERS
+    > {
 
     public readonly type =
         AgentCommandType.ADD_USERS;
 
 
-    private readonly arguments:
-        AddUsersCommandArguments;
-
-
-    constructor(
-        input: AddUsersCommandInput,
-    ) {
-
-        this.arguments = {
-            inboundTag:
-            input.inboundTag,
-
-            users:
-            input.users,
-        };
-
-    }
+    public constructor(
+        private readonly args:
+        AddUsersCommandArguments,
+    ) {}
 
 
     public getArguments():
         AddUsersCommandArguments {
 
-        return this.arguments;
-
+        return this.args;
     }
-
 }

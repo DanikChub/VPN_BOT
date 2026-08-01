@@ -1,15 +1,14 @@
-import {
-    AgentCommandType,
+import type {
+    AgentCommandArguments,
+    AgentCommandContractMap,
 } from "@vpn/common";
 
 
-export interface AgentCommand<TArguments = unknown> {
-
-    readonly type:
-        AgentCommandType;
-
+export interface AgentCommand<
+    TType extends keyof AgentCommandContractMap,
+> {
+    readonly type: TType;
 
     getArguments():
-        TArguments;
-
+        AgentCommandArguments<TType>;
 }

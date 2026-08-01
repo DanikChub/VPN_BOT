@@ -1,4 +1,6 @@
-import { randomUUID } from "node:crypto";
+import {
+    randomUUID,
+} from "node:crypto";
 
 import {
     MessageType,
@@ -6,39 +8,52 @@ import {
     type CommandMessage,
     type CommandResultMessage,
 } from "@vpn/common";
-import {NodeRegistry} from "../connection/node-registry";
+
+import {
+    NodeRegistry,
+} from "../connection/node-registry";
 
 
 interface PendingCommand {
     resolve(
-        message: CommandResultMessage,
+        message:
+        CommandResultMessage<unknown>,
     ): void;
 
     reject(
         reason?: unknown,
     ): void;
 
-    timeout: NodeJS.Timeout;
+    timeout:
+        NodeJS.Timeout;
 }
+
 
 interface CommandServiceOptions {
-    nodeRegistry: NodeRegistry;
+    nodeRegistry:
+        NodeRegistry;
 
-    timeoutMs?: number;
+    timeoutMs?:
+        number;
 }
 
+
 export class CommandService {
+
     private readonly nodeRegistry:
         NodeRegistry;
 
+
     private readonly timeoutMs:
         number;
+
 
     private readonly pending =
         new Map<
             string,
             PendingCommand
         >();
+
 
     public constructor(
         options: CommandServiceOptions,
@@ -51,13 +66,18 @@ export class CommandService {
             30_000;
     }
 
-    public sendCommand(
+
+    public sendCommand<TResult>(
         nodeId: number,
         command: AgentCommandType,
         arguments_: unknown,
-    ): Promise<CommandResultMessage> {
+    ): Promise<
+        CommandResultMessage<TResult>
+    > {
+
         const requestId =
             randomUUID();
+
 
         const message: CommandMessage = {
             type:
@@ -67,16 +87,21 @@ export class CommandService {
 
             payload: {
                 command,
+
                 arguments:
                 arguments_,
             },
         };
 
-        return new Promise<CommandResultMessage>(
+
+        return new Promise<
+            CommandResultMessage<TResult>
+        >(
             (
                 resolve,
                 reject,
             ) => {
+
                 const timeout =
                     setTimeout(
                         () => {
@@ -93,21 +118,32 @@ export class CommandService {
                         this.timeoutMs,
                     );
 
+
                 timeout.unref();
 
+
                 /*
-                 * Сначала регистрируем ожидание ответа.
-                 * Иначе быстрый command-result может прийти
-                 * раньше pending.set().
+                 * Регистрируем ожидание до отправки,
+                 * чтобы быстрый ответ не потерялся.
                  */
                 this.pending.set(
                     requestId,
                     {
-                        resolve,
+                        resolve: (
+                            result,
+                        ) => {
+                            resolve(
+                                result as
+                                    CommandResultMessage<TResult>,
+                            );
+                        },
+
                         reject,
+
                         timeout,
                     },
                 );
+
 
                 const sent =
                     this.nodeRegistry.send(
@@ -115,17 +151,21 @@ export class CommandService {
                         message,
                     );
 
+
                 if (sent) {
                     return;
                 }
+
 
                 clearTimeout(
                     timeout,
                 );
 
+
                 this.pending.delete(
                     requestId,
                 );
+
 
                 reject(
                     new Error(
@@ -136,54 +176,63 @@ export class CommandService {
         );
     }
 
-    public sendMessage(
-        nodeId:number,
-        message:unknown,
-    ):boolean{
 
+    public sendMessage(
+        nodeId: number,
+        message: unknown,
+    ): boolean {
 
         return this.nodeRegistry.send(
             nodeId,
             message,
         );
-
-
     }
 
+
     public complete(
-        message: CommandResultMessage,
+        message:
+        CommandResultMessage<unknown>,
     ): boolean {
+
         if (!message.requestId) {
             return false;
         }
+
 
         const pending =
             this.pending.get(
                 message.requestId,
             );
 
+
         if (!pending) {
             return false;
         }
+
 
         clearTimeout(
             pending.timeout,
         );
 
+
         this.pending.delete(
             message.requestId,
         );
+
 
         pending.resolve(
             message,
         );
 
+
         return true;
     }
+
 
     public rejectAll(
         reason: Error,
     ): void {
+
         for (
             const pending of
             this.pending.values()
@@ -192,15 +241,20 @@ export class CommandService {
                 pending.timeout,
             );
 
+
             pending.reject(
                 reason,
             );
         }
 
+
         this.pending.clear();
     }
 
-    public getPendingCount(): number {
+
+    public getPendingCount():
+        number {
+
         return this.pending.size;
     }
 }

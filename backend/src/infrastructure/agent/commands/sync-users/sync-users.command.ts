@@ -1,26 +1,31 @@
 import {
     AgentCommandType,
-    type SyncUsersCommandArguments,
 } from "@vpn/common";
 
-import type {
-    AgentCommand,
-} from "../agent-command.interface";
+import {
+    SyncUsersCommandArguments,
+} from "@vpn/common";
+
+
+import {AgentCommand} from "../agent-command.interface";
 
 export class SyncUsersCommand
-    implements AgentCommand<SyncUsersCommandArguments> {
 
+    implements AgentCommand<
+        AgentCommandType.SYNC_USERS
+    > {
     public readonly type =
         AgentCommandType.SYNC_USERS;
 
     public constructor(
-        private readonly arguments_:
+        private readonly args:
         SyncUsersCommandArguments,
     ) {}
+
 
     public getArguments():
         SyncUsersCommandArguments {
 
-        return this.arguments_;
+        return this.args;
     }
 }

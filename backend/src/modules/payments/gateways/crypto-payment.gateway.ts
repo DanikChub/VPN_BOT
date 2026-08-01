@@ -6,9 +6,21 @@ import {
     CheckPaymentResult,
     CreatePaymentInput,
     CreatePaymentResult,
-    PaymentGateway
+    GatewayWebhookInput,
+    GatewayWebhookResult,
+    PaymentGateway,
 } from "../payment-gateway.interface";
 
+
+interface CryptoPayWebhook {
+    update_id: number;
+
+    update_type: string;
+
+    request_date: string;
+
+    payload?: CryptoPayInvoice;
+}
 
 interface CryptoPayResponse<T> {
     ok: boolean;
@@ -293,6 +305,103 @@ class CryptoPaymentGateway
             response.data.result.items[0]
             ?? null
         );
+    }
+
+    async parseWebhook(
+        input: GatewayWebhookInput
+    ): Promise<GatewayWebhookResult> {
+
+        const webhook =
+            input.body as Partial<
+                CryptoPayWebhook
+            >;
+
+
+        if (
+            webhook.update_type !==
+            "invoice_paid"
+        ) {
+            return {
+                handled:
+                    false,
+
+                paymentId:
+                    null,
+
+                externalPaymentId:
+                    null,
+            };
+        }
+
+
+        const invoice =
+            webhook.payload;
+
+
+        if (
+            !invoice ||
+            invoice.status !== "paid"
+        ) {
+            throw new Error(
+                "Invalid Crypto Pay paid webhook"
+            );
+        }
+
+
+        const externalPaymentId =
+            String(
+                invoice.invoice_id
+            );
+
+
+        if (!invoice.payload) {
+            throw new Error(
+                "Crypto Pay invoice payload is missing"
+            );
+        }
+
+
+        let metadata: {
+            paymentId?: unknown;
+        };
+
+
+        try {
+            metadata =
+                JSON.parse(
+                    invoice.payload
+                );
+        } catch {
+            throw new Error(
+                "Invalid Crypto Pay invoice payload"
+            );
+        }
+
+
+        const paymentId =
+            Number(
+                metadata.paymentId
+            );
+
+
+        if (
+            !Number.isInteger(paymentId) ||
+            paymentId <= 0
+        ) {
+            throw new Error(
+                "Invalid paymentId in Crypto Pay webhook"
+            );
+        }
+
+
+        return {
+            handled:
+                true,
+
+            paymentId,
+
+            externalPaymentId,
+        };
     }
 }
 

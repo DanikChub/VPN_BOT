@@ -1,4 +1,5 @@
 import {
+    Op,
     Transaction
 } from "sequelize";
 
@@ -242,11 +243,11 @@ class SubscriptionService {
 
 
         if (transaction) {
-            transaction.afterCommit(
-                grantAccess
-            );
+            transaction.afterCommit(() => {
+                void grantAccess();
+            });
         } else {
-            await grantAccess();
+            void grantAccess();
         }
 
 
@@ -299,6 +300,35 @@ class SubscriptionService {
 
 
         return subscription;
+    }
+
+
+    async expireOverdue(
+        transaction?: Transaction
+    ): Promise<number> {
+
+        const [expiredCount] =
+            await Subscription.update(
+                {
+                    status:
+                        "expired",
+                },
+                {
+                    where: {
+                        status:
+                            "active",
+
+                        expires_at: {
+                            [Op.lte]:
+                                new Date(),
+                        },
+                    },
+
+                    transaction,
+                }
+            );
+
+        return expiredCount;
     }
 }
 

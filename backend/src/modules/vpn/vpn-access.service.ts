@@ -1,6 +1,7 @@
 import VpnCredential from "./vpn-credential.model";
 import VpnNode from "../vpn-nodes/vpn-node.model";
 import {NodeControlService} from "./node-control/node-control.service";
+import VpnNodeService from "../vpn-nodes/vpn-node.service";
 
 
 
@@ -15,12 +16,7 @@ export class VpnAccessService {
         credential: VpnCredential,
     ): Promise<void> {
         const nodes =
-            await VpnNode.findAll({
-                where: {
-                    is_active:
-                        true,
-                },
-            });
+            await VpnNodeService.findAvailableNodes();
 
         const results =
             await Promise.allSettled(
@@ -82,12 +78,7 @@ export class VpnAccessService {
         credential: VpnCredential,
     ): Promise<void> {
         const nodes =
-            await VpnNode.findAll({
-                where: {
-                    is_active:
-                        true,
-                },
-            });
+            await VpnNodeService.findAvailableNodes();
 
         const results =
             await Promise.allSettled(

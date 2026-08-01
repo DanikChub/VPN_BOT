@@ -164,6 +164,19 @@ export class XrayUserService {
             string[] = [];
 
 
+
+        console.log({
+            mode: input.mode,
+            knownEmails: input.knownEmails,
+            desiredEmails: desiredUsers.map(
+                u => u.email
+            ),
+            emailsToRemove,
+            usersToAdd:
+                usersToAdd.map(
+                    u => u.email
+                ),
+        });
         /*
          * Сначала удаляем лишних или старых пользователей.
          *
