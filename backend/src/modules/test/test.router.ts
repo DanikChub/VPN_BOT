@@ -1,8 +1,9 @@
 import { Router } from "express";
 
 import controller from "./test.controller";
-import type { CommandService } from "../../infrastructure/node-control/services/command.service";
+
 import { AgentCommandType } from "@vpn/common";
+import {CommandService} from "../../infrastructure/agent/rpc/command.service";
 
 
 

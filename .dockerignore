@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+
+**/node_modules
+**/dist
+**/.env
+**/*.log
+**/coverage
+
+admin
+web
+
+backend/storage/releases/*.tar.gz
