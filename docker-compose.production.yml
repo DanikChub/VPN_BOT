@@ -51,6 +51,7 @@ services:
       SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
 
       NODE_AGENT_TOKEN: ${NODE_AGENT_TOKEN}
+      AGENT_CONTROL_SERVER_URL: ${AGENT_CONTROL_SERVER_URL}
 
     volumes:
       - ./secrets/vpn_node_ssh_key:/run/secrets/vpn_node_ssh_key:ro

@@ -10,28 +10,17 @@ export class XrayInstaller {
 
 
 
-    async install():Promise<void>{
-
-
+    async install(): Promise<void> {
         await this.prepare();
 
         const installed =
             await this.isInstalled();
 
-
-        if(!installed){
-
+        if (!installed) {
             await this.installXray();
-
         }
 
-
-        await this.installXray();
-
-
         await this.verify();
-
-
     }
 
 
