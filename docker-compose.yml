@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:17-alpine
     container_name: vpn-postgres
+    pull_policy: missing
     restart: unless-stopped
 
     ports:

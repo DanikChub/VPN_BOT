@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped
+    pull_policy: missing
 
     environment:
       POSTGRES_DB: ${DB_NAME}
