@@ -142,6 +142,9 @@ class AdminNodesService {
                 host:
                 dto.host,
 
+                port:
+                dto.port,
+
                 sshPort:
                 dto.sshPort,
 

@@ -16,6 +16,8 @@ interface InstallOptions {
 
     host:string;
 
+    port: number;
+
     sshPort:number;
 
     sshUser:string;
@@ -107,7 +109,7 @@ class NodeProvisioningService {
                 "configure_xray",
                 async()=>{
                     return await xrayConfigurator.configure({
-                        port:443,
+                        port:options.port,
                         inboundTag:"vless-reality-in",
                         serverName:"www.cloudflare.com",
                     });
