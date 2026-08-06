@@ -1,24 +1,28 @@
-import {UsersTable, UserSubscriptionBadge} from "@/entities/user/ui";
 
 export {
     userApi,
 } from "./api";
 
 export type {
+    ExtendUserSubscriptionPayload,
+    GetUserByIdResponse,
     GetUsersParams,
     GetUsersResponse,
     SortDirection,
+    UserDetails,
     UserListItem,
+    UserSubscription,
+    UserSubscriptionDetails,
+    UserSubscriptionFilter,
+    UserSubscriptionMutationResponse,
+    UserSubscriptionStatus,
     UsersFiltersInterface,
     UsersPaginationInterface,
     UsersSortBy,
-    UserSubscription,
-    UserSubscriptionFilter,
-    UserSubscriptionStatus,
 } from "./model";
 
 export {
-    UserSubscriptionBadge
-}
+    UserSubscriptionBadge,
+    UsersTable,
+} from "./ui";
 
-export default UsersTable;

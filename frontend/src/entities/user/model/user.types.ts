@@ -30,6 +30,11 @@ export interface UserSubscription {
     updatedAt: string;
 }
 
+export interface UserSubscriptionDetails
+    extends UserSubscription {
+    userId: number;
+}
+
 export interface UserListItem {
     id: number;
 
@@ -89,4 +94,37 @@ export interface GetUsersParams {
 
     sortBy?: UsersSortBy;
     sortDirection?: SortDirection;
+}
+
+export interface UserDetails {
+    id: number;
+
+    telegramId: string;
+
+    username: string | null;
+    firstName: string | null;
+
+    balanceAmount: number;
+
+    subscription:
+        UserSubscription | null;
+
+    createdAt: string;
+    updatedAt: string;
+}
+
+
+export interface GetUserByIdResponse {
+    user: UserDetails;
+}
+
+
+export interface ExtendUserSubscriptionPayload {
+    durationDays: number;
+}
+
+
+export interface UserSubscriptionMutationResponse {
+    subscription:
+        UserSubscriptionDetails;
 }

@@ -1,4 +1,3 @@
-import UsersPage from "./ui/UsersPage.tsx";
-
-
-export default UsersPage;
+export {
+    default,
+} from "./ui/UsersPage";

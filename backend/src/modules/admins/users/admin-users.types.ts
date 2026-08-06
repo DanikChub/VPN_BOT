@@ -80,3 +80,32 @@ export interface GetAdminUsersResult {
         sortDirection: SortDirection;
     };
 }
+
+export interface AdminUserDetails {
+    id: number;
+
+    telegramId: string;
+    username: string | null;
+    firstName: string | null;
+
+    balanceAmount: number;
+
+    subscription: {
+        id: number;
+
+        status:
+            | "active"
+            | "expired"
+            | "blocked";
+
+        expiresAt: Date;
+
+        createdAt: Date;
+        updatedAt: Date;
+
+        hasActiveSubscription: boolean;
+    } | null;
+
+    createdAt: Date;
+    updatedAt: Date;
+}

@@ -1,4 +1,10 @@
+import {
+    useNavigate,
+} from "react-router-dom";
 
+import {
+    getUserDetailsPath,
+} from "@/shared/config/routePaths";
 
 import useUsersList from "@/widgets/users-list/model";
 import UsersFilters from "@/features/filter-users";
@@ -6,6 +12,8 @@ import UsersPagination from "@/features/paginate-users";
 import UsersListContent from "@/widgets/users-list/ui/UsersListContent.tsx";
 
 export function UsersList() {
+    const navigate = useNavigate();
+
     const {
         users,
         pagination,
@@ -15,6 +23,13 @@ export function UsersList() {
         actions,
     } = useUsersList();
 
+    const openUser = (
+        userId: number
+    ): void => {
+        navigate(
+            getUserDetailsPath(userId)
+        );
+    };
     return (
         <div className="space-y-5">
             <UsersFilters
@@ -40,6 +55,9 @@ export function UsersList() {
                 }
                 onSortChange={
                     actions.changeSort
+                }
+                onOpenUser={
+                    openUser
                 }
             />
 

@@ -8,6 +8,9 @@ import cryptoPaymentGateway
 import testPaymentGateway
     from "./gateways/test-payment.gateway";
 
+import yooKassaPaymentGateway
+    from "./gateways/yookassa-payment.gateway";
+
 
 const gateways:
     Record<string, PaymentGateway> = {
@@ -17,6 +20,9 @@ const gateways:
 
     test:
     testPaymentGateway,
+
+    yoo_kassa:
+    yooKassaPaymentGateway,
 };
 
 

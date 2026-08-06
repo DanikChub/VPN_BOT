@@ -2,7 +2,7 @@ import type {SortDirection, UserListItem, UsersSortBy} from "@/entities/user";
 
 import {Card, CardContent, EmptyState, Spinner} from "@/shared/ui";
 import {Users} from "lucide-react";
-import UsersTable from "@/entities/user";
+import { UsersTable } from "@/entities/user";
 
 interface UsersListContentProps {
     users: UserListItem[];
@@ -13,6 +13,9 @@ interface UsersListContentProps {
     sortDirection: SortDirection;
 
     onSortChange: (field: UsersSortBy) => void;
+    onOpenUser: (
+        userId: number
+    ) => void;
 }
 
 const UsersListContent = ({
@@ -23,7 +26,8 @@ const UsersListContent = ({
                             sortBy,
                             sortDirection,
 
-                            onSortChange
+                            onSortChange,
+                            onOpenUser,
                           }: UsersListContentProps) => {
     if (errorMessage) {
         return (
@@ -64,6 +68,7 @@ const UsersListContent = ({
             sortBy={sortBy}
             sortDirection={sortDirection}
             onSortChange={onSortChange}
+            onOpenUser={onOpenUser}
         />
     );
 }

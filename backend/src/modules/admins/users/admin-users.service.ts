@@ -1,334 +1,114 @@
 import {
     Op,
-    type Includeable,
-    type Order,
-    type WhereOptions, where, cast, col,
 } from "sequelize";
 
-import User from "../../users/user.model";
-import Subscription from "../../subscriptions/subscription.model";
+import User
+    from "../../users/user.model";
+
+import Subscription
+    from "../../subscriptions/subscription.model";
+
+import subscriptionService
+    from "../../subscriptions/subscription.service";
+
+import {
+    buildAdminUsersInclude,
+    buildAdminUsersOrder,
+    buildAdminUsersWhere,
+} from "./admin-users.query";
+
+import {
+    mapAdminUserDetails,
+    mapAdminUserListItem,
+} from "./admin-users.mapper";
+
+import vpnCredentialService
+    from "../../vpn/vpn-credential.service";
+
+import {
+    vpnAccessService,
+} from "../../../infrastructure/container";
 
 import type {
-    AdminUserListItem,
-    AdminUsersSortBy,
-    AdminUsersSubscriptionFilter,
+    AdminUserDetails,
     GetAdminUsersInput,
     GetAdminUsersResult,
-    SortDirection,
 } from "./admin-users.types";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-function normalizePositiveInteger(
-    value: number,
-    fallback: number
-): number {
-    if (
-        !Number.isInteger(value) ||
-        value < 1
-    ) {
-        return fallback;
-    }
-
-    return value;
-}
-
-function buildUserWhere(
-    search?: string
-): WhereOptions {
-    const normalizedSearch =
-        search?.trim();
-
-    if (!normalizedSearch) {
-        return {};
-    }
-
-    return {
-        [Op.or]: [
-            where(
-                cast(
-                    col("User.telegram_id"),
-                    "TEXT"
-                ),
-                {
-                    [Op.iLike]:
-                        `%${normalizedSearch}%`,
-                }
-            ),
-
-            {
-                username: {
-                    [Op.iLike]:
-                        `%${normalizedSearch}%`,
-                },
-            },
-
-            {
-                firstName: {
-                    [Op.iLike]:
-                        `%${normalizedSearch}%`,
-                },
-            },
-        ],
-    };
-}
-
-function buildOrder(
-    sortBy: AdminUsersSortBy,
-    sortDirection: SortDirection
-): Order {
-    const direction =
-        sortDirection === "asc"
-            ? "ASC"
-            : "DESC";
-
-    const sortColumnMap: Record<
-        AdminUsersSortBy,
-        string
-    > = {
-        id: "id",
-        createdAt: "created_at",
-        username: "username",
-        firstName: "first_name",
-    };
-
-    return [
-        [
-            sortColumnMap[sortBy],
-            direction,
-        ],
-
-        /*
-         * Если у нескольких пользователей одинаковое
-         * значение сортировки, id обеспечивает
-         * стабильный порядок.
-         */
-        ["id", "DESC"],
-    ];
-}
-
-function buildSubscriptionInclude(
-    subscriptionStatus:
-        AdminUsersSubscriptionFilter
-): Includeable {
-    const now = new Date();
-
-    const baseInclude = {
-        model: Subscription,
-        as: "subscription",
-        required: false,
-    };
-
-    switch (subscriptionStatus) {
-        case "active":
-            return {
-                ...baseInclude,
-                required: true,
-                where: {
-                    status: "active",
-                    expires_at: {
-                        [Op.gt]: now,
-                    },
-                },
-            };
-
-        case "expired":
-            return {
-                ...baseInclude,
-                required: true,
-                where: {
-                    [Op.or]: [
-                        {
-                            status: "expired",
-                        },
-                        {
-                            expires_at: {
-                                [Op.lte]: now,
-                            },
-                        },
-                    ],
-                },
-            };
-
-        case "blocked":
-            return {
-                ...baseInclude,
-                required: true,
-                where: {
-                    status: "blocked",
-                },
-            };
-
-        case "none":
-        case "all":
-        default:
-            return baseInclude;
-    }
-}
-
-function buildSubscriptionFilterWhere(
-    subscriptionStatus:
-        AdminUsersSubscriptionFilter
-): WhereOptions {
-    if (subscriptionStatus !== "none") {
-        return {};
-    }
-
-    /*
-     * Sequelize обращается к колонке связанной модели
-     * через синтаксис $alias.field$.
-     */
-    return {
-        "$subscription.id$": null,
-    };
-}
-
-function isSubscriptionActive(
-    subscription: Subscription | null
-): boolean {
-    if (!subscription) {
-        return false;
-    }
-
-    if (subscription.status !== "active") {
-        return false;
-    }
-
-    if (!subscription.expires_at) {
-        return false;
-    }
-
-    return (
-        subscription.expires_at.getTime() >
-        Date.now()
-    );
-}
-
-function mapUserToListItem(
-    user: User
-): AdminUserListItem {
-    const userWithSubscription =
-        user as User & {
-            subscription?: Subscription | null;
-        };
-
-    const subscription =
-        userWithSubscription.subscription ?? null;
-
-    return {
-        id: user.id,
-
-        telegramId: user.telegramId,
-        username: user.username,
-        firstName: user.firstName,
-
-        balanceAmount:
-            Number(user.balance_amount),
-
-        subscription: subscription
-            ? {
-                id: subscription.id,
-                status: subscription.status,
-                expiresAt:
-                subscription.expires_at,
-                createdAt:
-                subscription.createdAt,
-                updatedAt:
-                subscription.updatedAt,
-            }
-            : null,
-
-        hasActiveSubscription:
-            isSubscriptionActive(
-                subscription
-            ),
-
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-    };
-}
 
 class AdminUsersService {
     async getAll(
         input: GetAdminUsersInput
     ): Promise<GetAdminUsersResult> {
         const page =
-            normalizePositiveInteger(
+            this.normalizePositiveInteger(
                 input.page,
                 DEFAULT_PAGE
             );
 
-        const requestedLimit =
-            normalizePositiveInteger(
-                input.limit,
-                DEFAULT_LIMIT
-            );
-
-        const limit = Math.min(
-            requestedLimit,
-            MAX_LIMIT
-        );
-
-        const offset =
-            (page - 1) * limit;
-
-        const userWhere =
-            buildUserWhere(input.search);
-
-        const subscriptionWhere =
-            buildSubscriptionFilterWhere(
-                input.subscriptionStatus
-            );
-
-        const include =
-            buildSubscriptionInclude(
-                input.subscriptionStatus
+        const limit =
+            Math.min(
+                this.normalizePositiveInteger(
+                    input.limit,
+                    DEFAULT_LIMIT
+                ),
+                MAX_LIMIT
             );
 
         const result =
             await User.findAndCountAll({
-                where: {
-                    [Op.and]: [
-                        userWhere,
-                        subscriptionWhere,
-                    ],
-                },
+                where:
+                    buildAdminUsersWhere(
+                        input.search,
+                        input.subscriptionStatus
+                    ),
 
-                include: [
-                    include,
-                ],
+                include:
+                    buildAdminUsersInclude(
+                        input.subscriptionStatus
+                    ),
 
-                order: buildOrder(
-                    input.sortBy,
-                    input.sortDirection
-                ),
+                order:
+                    buildAdminUsersOrder(
+                        input.sortBy,
+                        input.sortDirection
+                    ),
 
                 limit,
-                offset,
-                distinct: true,
-                subQuery: false,
+
+                offset:
+                    (page - 1) *
+                    limit,
+
+                distinct:
+                    true,
+
+                subQuery:
+                    false,
             });
 
-        const totalItems = result.count;
+        const totalItems =
+            result.count;
 
         const totalPages =
-            totalItems === 0
-                ? 0
-                : Math.ceil(
-                    totalItems / limit
-                );
+            Math.ceil(
+                totalItems / limit
+            );
 
         return {
-            users: result.rows.map(
-                mapUserToListItem
-            ),
+            users:
+                result.rows.map(
+                    mapAdminUserListItem
+                ),
 
             pagination: {
                 page,
                 limit,
-
                 totalItems,
                 totalPages,
 
@@ -341,8 +121,7 @@ class AdminUsersService {
 
             filters: {
                 search:
-                    input.search?.trim() ||
-                    null,
+                    input.search ?? null,
 
                 subscriptionStatus:
                 input.subscriptionStatus,
@@ -355,9 +134,281 @@ class AdminUsersService {
             },
         };
     }
+
+    async getById(
+        userId: number
+    ): Promise<AdminUserDetails> {
+        const user =
+            await User.findByPk(
+                userId,
+                {
+                    include: [
+                        {
+                            model:
+                            Subscription,
+
+                            as:
+                                "subscription",
+
+                            required:
+                                false,
+                        },
+                    ],
+                }
+            );
+
+        if (!user) {
+            throw new Error(
+                "User not found"
+            );
+        }
+
+        return mapAdminUserDetails(
+            user
+        );
+    }
+
+
+    async extendSubscription(
+        userId: number,
+        durationDays: number
+    ): Promise<Subscription> {
+        await this.ensureUserExists(
+            userId
+        );
+
+        return subscriptionService.extend(
+            userId,
+            durationDays
+        );
+    }
+
+
+    async expireSubscription(
+        userId: number
+    ): Promise<Subscription> {
+        await this.ensureUserExists(
+            userId
+        );
+
+        return subscriptionService.expire(
+            userId
+        );
+    }
+
+    async blockSubscription(
+        userId: number
+    ): Promise<Subscription> {
+        await this.ensureUserExists(
+            userId
+        );
+
+        const subscription =
+            await Subscription.findOne({
+                where: {
+                    user_id: userId,
+                },
+            });
+
+        if (!subscription) {
+            throw new Error(
+                "Subscription not found"
+            );
+        }
+
+        if (
+            subscription.status ===
+            "blocked"
+        ) {
+            return subscription;
+        }
+
+        const credential =
+            await vpnCredentialService.get(
+                userId
+            );
+
+        subscription.status =
+            "blocked";
+
+        await subscription.save();
+
+        if (credential) {
+            void vpnAccessService
+                .revoke(
+                    credential
+                )
+                .catch((error) => {
+                    console.error(
+                        "[VPN] Failed to revoke access after admin block",
+                        {
+                            userId,
+
+                            credentialId:
+                            credential.id,
+
+                            uuid:
+                            credential.uuid,
+
+                            error:
+                                error instanceof Error
+                                    ? {
+                                        name:
+                                        error.name,
+
+                                        message:
+                                        error.message,
+
+                                        stack:
+                                        error.stack,
+                                    }
+                                    : error,
+                        }
+                    );
+                });
+        }
+
+        return subscription;
+    }
+
+    async unblockSubscription(
+        userId: number
+    ): Promise<Subscription> {
+        await this.ensureUserExists(
+            userId
+        );
+
+        const subscription =
+            await Subscription.findOne({
+                where: {
+                    user_id: userId,
+                },
+            });
+
+        if (!subscription) {
+            throw new Error(
+                "Subscription not found"
+            );
+        }
+
+        /*
+         * Повторный запрос на разблокировку
+         * также делаем идемпотентным.
+         */
+        if (
+            subscription.status !==
+            "blocked"
+        ) {
+            return subscription;
+        }
+
+        const expiresAt =
+            new Date(
+                subscription.expires_at
+            );
+
+        const isExpired =
+            Number.isNaN(
+                expiresAt.getTime()
+            ) ||
+            expiresAt.getTime() <=
+            Date.now();
+
+        if (isExpired) {
+            subscription.status =
+                "expired";
+
+            await subscription.save();
+
+            return subscription;
+        }
+
+        const credential =
+            await vpnCredentialService
+                .getOrCreate(
+                    userId
+                );
+
+        subscription.status =
+            "active";
+
+        await subscription.save();
+
+        /*
+         * Повторяем подход SubscriptionService.extend:
+         * состояние в БД уже сохранено,
+         * ошибка конкретного узла не ломает запрос.
+         */
+        void vpnAccessService
+            .grant(
+                credential
+            )
+            .catch((error) => {
+                console.error(
+                    "[VPN] Failed to grant access after admin unblock",
+                    {
+                        userId,
+
+                        credentialId:
+                        credential.id,
+
+                        uuid:
+                        credential.uuid,
+
+                        error:
+                            error instanceof Error
+                                ? {
+                                    name:
+                                    error.name,
+
+                                    message:
+                                    error.message,
+
+                                    stack:
+                                    error.stack,
+                                }
+                                : error,
+                    }
+                );
+            });
+
+        return subscription;
+    }
+
+
+    private normalizePositiveInteger(
+        value: number,
+        fallback: number
+    ): number {
+        return (
+            Number.isInteger(value) &&
+            value > 0
+        )
+            ? value
+            : fallback;
+    }
+
+
+    private async ensureUserExists(
+        userId: number
+    ): Promise<void> {
+        const user =
+            await User.findByPk(
+                userId,
+                {
+                    attributes: [
+                        "id",
+                    ],
+                }
+            );
+
+        if (!user) {
+            throw new Error(
+                "User not found"
+            );
+        }
+    }
 }
 
-const adminUsersService =
-    new AdminUsersService();
 
-export default adminUsersService;
+export default new AdminUsersService();

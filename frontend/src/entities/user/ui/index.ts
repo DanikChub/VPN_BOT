@@ -1,9 +1,7 @@
-
-
-import {UsersTable} from "./UserTable";
-import {UserSubscriptionBadge} from "./UserSubscriptionBadge";
-
 export {
     UsersTable,
-    UserSubscriptionBadge
-}
+} from "./UserTable";
+
+export {
+    UserSubscriptionBadge,
+} from "./UserSubscriptionBadge";

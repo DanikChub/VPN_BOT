@@ -1,4 +1,5 @@
 import {
+    CreditCard,
     type LucideIcon,
 } from "lucide-react";
 
@@ -33,6 +34,12 @@ export const sidebarLinks: SidebarLink[] = [
         label: "Узлы",
         path: routePaths.nodes,
         icon: Server,
+    },
+
+    {
+        label: "Тарифы",
+        path: routePaths.plans,
+        icon: CreditCard,
     },
 
 ];

@@ -13,6 +13,10 @@ interface UsersTableProps {
     onSortChange: (
         sortBy: UsersSortBy
     ) => void;
+
+    onOpenUser: (
+        userId: number
+    ) => void;
 }
 
 export function UsersTable({
@@ -20,6 +24,7 @@ export function UsersTable({
                                sortBy,
                                sortDirection,
                                onSortChange,
+                               onOpenUser,
                            }: UsersTableProps) {
     return (
         <TableContainer>
@@ -126,6 +131,9 @@ export function UsersTable({
                             <TableCell className="text-right">
                                 <Button
                                     aria-label="Открыть пользователя"
+                                    onClick={() => {
+                                        onOpenUser(user.id);
+                                    }}
                                     size="icon"
                                     variant="ghost"
                                 >

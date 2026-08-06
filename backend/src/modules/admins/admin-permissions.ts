@@ -11,6 +11,11 @@ export const adminPermissions = [
     "subscriptions.read",
     "subscriptions.update",
 
+    "plans.read",
+    "plans.create",
+    "plans.update",
+    "plans.delete",
+
     "payments.read",
     "payments.recheck",
 
@@ -43,6 +48,11 @@ const rolePermissions: Record<
         "users.block",
         "users.balance.update",
 
+        "plans.read",
+        "plans.create",
+        "plans.update",
+        "plans.delete",
+
         "subscriptions.read",
         "subscriptions.update",
 
@@ -58,6 +68,7 @@ const rolePermissions: Record<
     support: [
         "users.read",
         "subscriptions.read",
+        "plans.read",
         "payments.read",
         "nodes.read",
     ],

@@ -4,115 +4,15 @@ import type {
     Response,
 } from "express";
 
-import adminUsersService from "./admin-users.service";
+import adminUsersService
+    from "./admin-users.service";
 
-import type {
-    AdminUsersSortBy,
-    AdminUsersSubscriptionFilter,
-    SortDirection,
-} from "./admin-users.types";
+import {
+    parseAdminUserId,
+    parseAdminUsersQuery,
+    parseDurationDays,
+} from "./admin-users.validation";
 
-const allowedSubscriptionStatuses:
-    AdminUsersSubscriptionFilter[] = [
-    "all",
-    "active",
-    "expired",
-    "none",
-];
-
-const allowedSortFields:
-    AdminUsersSortBy[] = [
-    "id",
-    "createdAt",
-    "username",
-    "firstName",
-];
-
-const allowedSortDirections:
-    SortDirection[] = [
-    "asc",
-    "desc",
-];
-
-function parsePositiveInteger(
-    value: unknown,
-    fallback: number
-): number {
-    if (typeof value !== "string") {
-        return fallback;
-    }
-
-    const parsed = Number.parseInt(
-        value,
-        10
-    );
-
-    if (
-        !Number.isInteger(parsed) ||
-        parsed < 1
-    ) {
-        return fallback;
-    }
-
-    return parsed;
-}
-
-function parseSearch(
-    value: unknown
-): string | undefined {
-    if (typeof value !== "string") {
-        return undefined;
-    }
-
-    const search = value.trim();
-
-    return search || undefined;
-}
-
-function parseSubscriptionStatus(
-    value: unknown
-): AdminUsersSubscriptionFilter {
-    if (
-        typeof value === "string" &&
-        allowedSubscriptionStatuses.includes(
-            value as AdminUsersSubscriptionFilter
-        )
-    ) {
-        return value as AdminUsersSubscriptionFilter;
-    }
-
-    return "all";
-}
-
-function parseSortBy(
-    value: unknown
-): AdminUsersSortBy {
-    if (
-        typeof value === "string" &&
-        allowedSortFields.includes(
-            value as AdminUsersSortBy
-        )
-    ) {
-        return value as AdminUsersSortBy;
-    }
-
-    return "createdAt";
-}
-
-function parseSortDirection(
-    value: unknown
-): SortDirection {
-    if (
-        typeof value === "string" &&
-        allowedSortDirections.includes(
-            value as SortDirection
-        )
-    ) {
-        return value as SortDirection;
-    }
-
-    return "desc";
-}
 
 class AdminUsersController {
     async getAll(
@@ -121,47 +21,186 @@ class AdminUsersController {
         next: NextFunction
     ): Promise<void> {
         try {
+            const input =
+                parseAdminUsersQuery(
+                    req.query
+                );
+
             const result =
-                await adminUsersService.getAll({
-                    page: parsePositiveInteger(
-                        req.query.page,
-                        1
-                    ),
+                await adminUsersService
+                    .getAll(input);
 
-                    limit: parsePositiveInteger(
-                        req.query.limit,
-                        20
-                    ),
+            res.status(200).json(
+                result
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
 
-                    search: parseSearch(
-                        req.query.search
-                    ),
 
-                    subscriptionStatus:
-                        parseSubscriptionStatus(
-                            req.query
-                                .subscriptionStatus
+    async extendSubscription(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const subscription =
+                await adminUsersService
+                    .extendSubscription(
+                        parseAdminUserId(
+                            req.params.id
                         ),
 
-                    sortBy: parseSortBy(
-                        req.query.sortBy
-                    ),
+                        parseDurationDays(
+                            req.body?.durationDays
+                        )
+                    );
 
-                    sortDirection:
-                        parseSortDirection(
-                            req.query
-                                .sortDirection
-                        ),
-                });
+            res.status(200).json({
+                subscription,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 
-            res.status(200).json(result);
+
+    async expireSubscription(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const subscription =
+                await adminUsersService
+                    .expireSubscription(
+                        parseAdminUserId(
+                            req.params.id
+                        )
+                    );
+
+            res.status(200).json({
+                subscription,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getById(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userId =
+                parseAdminUserId(
+                    req.params.id
+                );
+
+            const user =
+                await adminUsersService
+                    .getById(
+                        userId
+                    );
+
+            res.status(200).json({
+                user,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    async blockSubscription(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userId =
+                parseAdminUserId(
+                    req.params.id
+                );
+
+            const subscription =
+                await adminUsersService
+                    .blockSubscription(
+                        userId
+                    );
+
+            res.status(200).json({
+                subscription: {
+                    id:
+                    subscription.id,
+
+                    userId:
+                    subscription.user_id,
+
+                    status:
+                    subscription.status,
+
+                    expiresAt:
+                    subscription.expires_at,
+
+                    createdAt:
+                    subscription.createdAt,
+
+                    updatedAt:
+                    subscription.updatedAt,
+                },
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    async unblockSubscription(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userId =
+                parseAdminUserId(
+                    req.params.id
+                );
+
+            const subscription =
+                await adminUsersService
+                    .unblockSubscription(
+                        userId
+                    );
+
+            res.status(200).json({
+                subscription: {
+                    id:
+                    subscription.id,
+
+                    userId:
+                    subscription.user_id,
+
+                    status:
+                    subscription.status,
+
+                    expiresAt:
+                    subscription.expires_at,
+
+                    createdAt:
+                    subscription.createdAt,
+
+                    updatedAt:
+                    subscription.updatedAt,
+                },
+            });
         } catch (error) {
             next(error);
         }
     }
 }
 
-const adminUsersController =
-    new AdminUsersController();
 
-export default adminUsersController;
+export default new AdminUsersController();
