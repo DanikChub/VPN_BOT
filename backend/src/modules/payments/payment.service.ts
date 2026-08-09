@@ -17,6 +17,10 @@ import paymentGatewayRegistry from "./payment-gateway.registry";
 import Subscription from "../subscriptions/subscription.model";
 import vpnCredentialService from "../vpn/vpn-credential.service";
 
+import {
+    PaymentGatewayTemporaryError,
+} from "./payment-gateway.interface";
+
 interface ProcessPaymentWebhookInput {
     code: string;
 
@@ -250,10 +254,69 @@ class PaymentService {
          * PaymentService не знает,
          * какой именно провайдер вызывается.
          */
-        const gatewayResult =
-            await paymentGateway.checkPayment(
-                payment.provider_payment_id
-            );
+        let gatewayResult;
+
+        try {
+
+            gatewayResult =
+                await paymentGateway.checkPayment(
+                    payment.provider_payment_id
+                );
+
+        } catch (error) {
+
+            /*
+             * Провайдер временно недоступен.
+             *
+             * Это НЕ означает:
+             * - что платёж провален;
+             * - что платёж отменён;
+             * - что пользователь не заплатил.
+             *
+             * Поэтому Payment.status
+             * оставляем pending.
+             */
+            if (
+                error instanceof
+                PaymentGatewayTemporaryError
+            ) {
+
+                console.warn(
+                    "[PAYMENT] Payment check temporarily failed",
+                    {
+                        paymentId:
+                        payment.id,
+
+                        paymentMethod:
+                        paymentMethod.code,
+
+                        providerPaymentId:
+                        payment.provider_payment_id,
+
+                        message:
+                        error.message,
+                    }
+                );
+
+
+                return {
+                    paymentId:
+                    payment.id,
+
+                    status:
+                        "pending",
+
+                    paid:
+                        false,
+
+                    retryable:
+                        true,
+                };
+            }
+
+
+            throw error;
+        }
 
         if (
             gatewayResult.externalPaymentId !==

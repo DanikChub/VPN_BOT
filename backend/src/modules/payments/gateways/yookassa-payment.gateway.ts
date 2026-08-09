@@ -1,7 +1,3 @@
-import {
-    randomUUID,
-} from "node:crypto";
-
 import axios, {
     type AxiosInstance,
 } from "axios";
@@ -16,6 +12,10 @@ import type {
     PaymentGateway,
 } from "../payment-gateway.interface";
 
+
+import {
+    PaymentGatewayTemporaryError
+} from "../payment-gateway.interface";
 
 type YooKassaPaymentStatus =
     | "pending"
@@ -232,7 +232,7 @@ class YooKassaPaymentGateway
                          * идемпотентности для создания.
                          */
                         "Idempotence-Key":
-                            randomUUID(),
+                            `payment-${input.paymentId}`,
                     },
                 }
             );
@@ -276,18 +276,22 @@ class YooKassaPaymentGateway
     async checkPayment(
         externalPaymentId: string
     ): Promise<CheckPaymentResult> {
-        const response =
-            await this.api.get<
-                YooKassaPayment
-            >(
-                `/payments/${encodeURIComponent(
-                    externalPaymentId
-                )}`
-            );
-
 
         const payment =
-            response.data;
+            await this.executeWithRetry(
+                async () => {
+                    const response =
+                        await this.api.get<
+                            YooKassaPayment
+                        >(
+                            `/payments/${encodeURIComponent(
+                                externalPaymentId
+                            )}`
+                        );
+
+                    return response.data;
+                }
+            );
 
 
         if (
@@ -503,6 +507,129 @@ class YooKassaPaymentGateway
          * это как cancelled.
          */
         return "cancelled";
+    }
+
+
+    private async executeWithRetry<T>(
+        operation: () => Promise<T>,
+    ): Promise<T> {
+
+        const delays =
+            [
+                0,
+                500,
+                1500,
+            ];
+
+
+        let lastError:
+            unknown;
+
+
+        for (
+            let attempt = 0;
+            attempt < delays.length;
+            attempt++
+        ) {
+
+            if (
+                delays[attempt] > 0
+            ) {
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            delays[attempt]
+                        )
+                );
+            }
+
+
+            try {
+                return await operation();
+
+            } catch (error) {
+
+                lastError =
+                    error;
+
+
+                if (
+                    !this.isTemporaryError(
+                        error
+                    )
+                ) {
+                    throw error;
+                }
+
+
+                console.warn(
+                    "[PAYMENT] YooKassa temporary error",
+                    {
+                        attempt:
+                            attempt + 1,
+
+                        attempts:
+                        delays.length,
+
+                        error:
+                            axios.isAxiosError(error)
+                                ? {
+                                    code:
+                                    error.code,
+
+                                    status:
+                                    error.response
+                                        ?.status,
+
+                                    message:
+                                    error.message,
+                                }
+                                : error,
+                    }
+                );
+            }
+        }
+
+
+        throw new PaymentGatewayTemporaryError(
+            "YooKassa is temporarily unavailable",
+            lastError,
+        );
+    }
+
+
+    private isTemporaryError(
+        error: unknown,
+    ): boolean {
+
+        if (
+            !axios.isAxiosError(
+                error
+            )
+        ) {
+            return false;
+        }
+
+
+        /*
+         * Ответ вообще не пришёл:
+         * timeout, reset, DNS/network error и т.п.
+         */
+        if (
+            !error.response
+        ) {
+            return true;
+        }
+
+
+        /*
+         * Ошибка на стороне YooKassa.
+         */
+        return (
+            error.response.status >= 500 &&
+            error.response.status < 600
+        );
     }
 }
 

@@ -85,3 +85,16 @@ export interface CreateNodeDto {
     sshUser: string;
     sshPassword: string;
 }
+
+
+export type EditableNodeField =
+    | "name"
+    | "display_name"
+    | "country_code"
+    | "sort_order"
+    | "is_active";
+
+export interface UpdateNodeFieldDto {
+    field: EditableNodeField;
+    value: unknown;
+}

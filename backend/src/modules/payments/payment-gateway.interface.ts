@@ -1,3 +1,17 @@
+export class PaymentGatewayTemporaryError
+    extends Error {
+
+    constructor(
+        message: string,
+        public readonly cause?: unknown,
+    ) {
+        super(message);
+
+        this.name =
+            "PaymentGatewayTemporaryError";
+    }
+}
+
 export interface CreatePaymentInput {
     paymentId: number;
 
@@ -19,12 +33,6 @@ export type GatewayPaymentStatus =
     | "failed"
     | "cancelled"
     | "expired";
-
-export interface CheckPaymentResult {
-    externalPaymentId: string;
-
-    status: GatewayPaymentStatus;
-}
 
 export interface CheckPaymentResult {
     externalPaymentId: string;

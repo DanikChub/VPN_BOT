@@ -1,15 +1,10 @@
 import VpnCredential from "./vpn-credential.model";
-import VpnNode from "../vpn-nodes/vpn-node.model";
-import {NodeControlService} from "./node-control/node-control.service";
+import { NodeControlService } from "./node-control/node-control.service";
 import VpnNodeService from "../vpn-nodes/vpn-node.service";
-
-
-
 
 export class VpnAccessService {
     public constructor(
-        private readonly nodeControlService:
-        NodeControlService,
+        private readonly nodeControlService: NodeControlService,
     ) {}
 
     public async grant(
@@ -18,10 +13,16 @@ export class VpnAccessService {
         const nodes =
             await VpnNodeService.findAvailableNodes();
 
+        if (nodes.length === 0) {
+            throw new Error(
+                "No available VPN nodes",
+            );
+        }
+
         const results =
             await Promise.allSettled(
                 nodes.map(
-                    (node) =>
+                    node =>
                         this.nodeControlService.addUser(
                             node,
                             credential,
@@ -31,46 +32,52 @@ export class VpnAccessService {
 
         const failedNodes =
             results
-                .map(
-                    (
-                        result,
-                        index,
-                    ) => ({
-                        result,
-                        node:
-                            nodes[index],
-                    }),
-                )
+                .map((result, index) => ({
+                    result,
+                    node: nodes[index],
+                }))
                 .filter(
                     ({ result }) =>
-                        result.status ===
-                        "rejected",
+                        result.status === "rejected",
                 );
 
-        if (
-            failedNodes.length ===
-            0
-        ) {
-            return;
-        }
+        const succeededCount =
+            results.length - failedNodes.length;
 
-        for (
-            const {
-                result,
-                node,
-            } of failedNodes
-            ) {
+        for (const {
+            result,
+            node,
+        } of failedNodes) {
             console.error(
                 `[VPN] Failed to grant access on node ${node.name}`,
-                result.status ===
-                "rejected"
+                result.status === "rejected"
                     ? result.reason
                     : undefined,
             );
         }
 
+        /*
+         * Частичный успех — это нормально.
+         *
+         * Например:
+         * node 1 -> success
+         * node 2 -> offline
+         * node 3 -> success
+         *
+         * Пользователю доступ уже выдан,
+         * поэтому исключение наверх не бросаем.
+         */
+        if (succeededCount > 0) {
+            return;
+        }
+
+        /*
+         * Если не удалось добавить пользователя
+         * вообще ни на одну ноду — это уже
+         * настоящий провал выдачи VPN.
+         */
         throw new Error(
-            `Failed to grant VPN access on ${failedNodes.length} node(s)`,
+            "Failed to grant VPN access on all nodes",
         );
     }
 
@@ -80,10 +87,14 @@ export class VpnAccessService {
         const nodes =
             await VpnNodeService.findAvailableNodes();
 
+        if (nodes.length === 0) {
+            return;
+        }
+
         const results =
             await Promise.allSettled(
                 nodes.map(
-                    (node) =>
+                    node =>
                         this.nodeControlService.removeUser(
                             node,
                             credential,
@@ -93,46 +104,44 @@ export class VpnAccessService {
 
         const failedNodes =
             results
-                .map(
-                    (
-                        result,
-                        index,
-                    ) => ({
-                        result,
-                        node:
-                            nodes[index],
-                    }),
-                )
+                .map((result, index) => ({
+                    result,
+                    node: nodes[index],
+                }))
                 .filter(
                     ({ result }) =>
-                        result.status ===
-                        "rejected",
+                        result.status === "rejected",
                 );
 
-        if (
-            failedNodes.length ===
-            0
-        ) {
-            return;
-        }
+        const succeededCount =
+            results.length - failedNodes.length;
 
-        for (
-            const {
-                result,
-                node,
-            } of failedNodes
-            ) {
+        for (const {
+            result,
+            node,
+        } of failedNodes) {
             console.error(
                 `[VPN] Failed to revoke access on node ${node.name}`,
-                result.status ===
-                "rejected"
+                result.status === "rejected"
                     ? result.reason
                     : undefined,
             );
         }
 
+        /*
+         * Если хотя бы часть нод успешно
+         * обработала удаление — основной
+         * пользовательский сценарий не ломаем.
+         *
+         * Отставшую ноду потом должен
+         * догнать reconcile.
+         */
+        if (succeededCount > 0) {
+            return;
+        }
+
         throw new Error(
-            `Failed to revoke VPN access on ${failedNodes.length} node(s)`,
+            "Failed to revoke VPN access on all nodes",
         );
     }
 }

@@ -10,6 +10,7 @@ import VpnNode
     from "../../vpn-nodes/vpn-node.model";
 
 import {
+    EditableNodeField,
     mapNodeToAdminResponse,
 } from "./admin-nodes.types";
 
@@ -224,6 +225,111 @@ class AdminNodesService {
             synchronized:
                 true,
         };
+    }
+
+    public async updateField(
+        nodeId: number,
+        field: EditableNodeField,
+        value: unknown,
+    ) {
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+            );
+
+        if (!node) {
+            return null;
+        }
+
+        const normalizedValue =
+            this.normalizeEditableField(
+                field,
+                value,
+            );
+
+        await node.update({
+            [field]:
+            normalizedValue,
+        });
+
+        return mapNodeToAdminResponse(
+            node,
+        );
+    }
+
+    private normalizeEditableField(
+        field: EditableNodeField,
+        value: unknown,
+    ) {
+        switch (field) {
+
+            case "name":
+            case "display_name": {
+                if (
+                    value !== null &&
+                    typeof value !== "string"
+                ) {
+                    throw new Error(
+                        `Invalid value for ${field}`,
+                    );
+                }
+
+                return value;
+            }
+
+
+            case "country_code": {
+                if (value === null) {
+                    return null;
+                }
+
+                if (
+                    typeof value !== "string" ||
+                    !/^[A-Za-z]{2}$/.test(
+                        value,
+                    )
+                ) {
+                    throw new Error(
+                        "Invalid country_code",
+                    );
+                }
+
+                return value.toUpperCase();
+            }
+
+
+            case "sort_order": {
+                if (
+                    typeof value !== "number" ||
+                    !Number.isInteger(value)
+                ) {
+                    throw new Error(
+                        "Invalid sort_order",
+                    );
+                }
+
+                return value;
+            }
+
+
+            case "is_active": {
+                if (
+                    typeof value !== "boolean"
+                ) {
+                    throw new Error(
+                        "Invalid is_active",
+                    );
+                }
+
+                return value;
+            }
+
+
+            default:
+                throw new Error(
+                    `Field "${field}" is not editable`,
+                );
+        }
     }
 }
 

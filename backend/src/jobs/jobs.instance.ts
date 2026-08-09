@@ -1,11 +1,12 @@
-import NodeUsersSyncJob
-    from "./node-users-sync.job";
-
 
 import {
     nodeSyncService,
 } from "../infrastructure/container";
+
 import SubscriptionExpirationJob from "./subscription-expiration.job";
+import NodeStatusJob from "./node-status.job";
+import NodeUsersSyncJob from "./node-users-sync.job";
+
 
 
 
@@ -20,4 +21,5 @@ export const subscriptionExpirationJob =
         nodeSyncService,
     );
 
-
+export const nodeStatusJob =
+    new NodeStatusJob();

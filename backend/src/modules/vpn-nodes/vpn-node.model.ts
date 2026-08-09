@@ -52,6 +52,12 @@ class VpnNode extends Model<
 
     declare ssh_port: CreationOptional<number>;
     declare ssh_user: CreationOptional<string>;
+
+    declare display_name: string | null;
+
+    declare country_code: string | null;
+
+    declare sort_order: CreationOptional<number>;
 }
 
 VpnNode.init(
@@ -171,6 +177,22 @@ VpnNode.init(
             type: DataTypes.STRING,
             allowNull: false,
             defaultValue: "root",
+        },
+
+        display_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
+        country_code: {
+            type: DataTypes.STRING(2),
+            allowNull: true,
+        },
+
+        sort_order: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
         },
     },
     {
