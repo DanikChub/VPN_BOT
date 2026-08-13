@@ -64,20 +64,30 @@ export class XrayConfigurator {
                     "warning",
             },
 
+
             api: {
-                tag: "api",
-                listen:  "127.0.0.1:10085",
+                tag:
+                    "api",
+
+                listen:
+                    "127.0.0.1:10085",
+
                 services: [
                     "HandlerService",
                     "StatsService",
                 ],
             },
+
+
             stats: {},
+
+
             policy: {
                 levels: {
                     "0": {
                         statsUserUplink:
                             true,
+
                         statsUserDownlink:
                             true,
                     },
@@ -86,60 +96,163 @@ export class XrayConfigurator {
                 system: {
                     statsInboundUplink:
                         true,
+
                     statsInboundDownlink:
                         true,
+
                     statsOutboundUplink:
                         true,
+
                     statsOutboundDownlink:
                         true,
                 },
             },
 
+
             inbounds: [
+
+                /*
+                 * =====================================================
+                 * 1. ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ
+                 *
+                 * HAPP -> Exit напрямую
+                 *
+                 * Пользователи сюда добавляются runtime
+                 * через Xray API.
+                 * =====================================================
+                 */
                 {
                     tag:
                     options.inboundTag,
+
                     listen:
                         "0.0.0.0",
+
                     port:
                     options.port,
+
                     protocol:
                         "vless",
+
                     settings: {
                         clients: [],
+
                         decryption:
                             "none",
                     },
+
                     streamSettings: {
                         network:
                             "tcp",
+
                         security:
                             "reality",
+
                         realitySettings: {
                             show:
                                 false,
+
                             dest:
                                 `${options.serverName}:443`,
+
                             serverNames: [
                                 options.serverName,
                             ],
+
                             privateKey:
                             keys.privateKey,
+
                             shortIds: [
                                 shortId,
                             ],
                         },
                     },
                 },
-            ],
-            outbounds: [
+
+
+                /*
+                 * =====================================================
+                 * 2. ВХОД ОТ ORIGIN / MOTHER
+                 *
+                 * Mother -> Exit
+                 *
+                 * Здесь НЕ пользователи VPN.
+                 *
+                 * Здесь только один технический UUID,
+                 * которым Mother авторизуется на Exit.
+                 * =====================================================
+                 */
                 {
-                    protocol: "freedom",
+                    tag:
+                        "from-origin",
+
+                    listen:
+                        "0.0.0.0",
+
+                    port:
+                        10443,
+
+                    protocol:
+                        "vless",
+
+                    settings: {
+                        users: [
+                            {
+                                id:
+                                    "7ddde292-57c0-4f3d-93fe-bf83b8dc4503",
+
+                                flow:
+                                    "xtls-rprx-vision",
+                            },
+                        ],
+
+                        decryption:
+                            "none",
+                    },
+
+                    streamSettings: {
+                        network:
+                            "tcp",
+
+                        security:
+                            "tls",
+
+                        tlsSettings: {
+                            alpn: [
+                                "h2",
+                                "http/1.1",
+                            ],
+
+                            certificates: [
+                                {
+                                    certificateFile:
+                                        "/usr/local/etc/xray/tls/fullchain.pem",
+
+                                    keyFile:
+                                        "/usr/local/etc/xray/tls/privkey.pem",
+                                },
+                            ],
+                        },
+                    },
                 },
             ],
+
+
+            outbounds: [
+                {
+                    tag:
+                        "internet",
+
+                    protocol:
+                        "freedom",
+                },
+            ],
+
+
             routing: {
                 domainStrategy:
                     "AsIs",
+
                 rules: [
                     {
                         type:
@@ -148,6 +261,7 @@ export class XrayConfigurator {
                         inboundTag: [
                             "api",
                         ],
+
                         outboundTag:
                             "api",
                     },

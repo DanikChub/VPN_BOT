@@ -92,12 +92,13 @@ class VpnSubscriptionController {
             });
 
 
-        const links =
-            nodes.map((node) =>
-                vlessUrlService.build(
-                    credential,
-                    node
-                )
+        const configs =
+            nodes.map(
+                node =>
+                    vlessUrlService.build(
+                        credential,
+                        node,
+                    ),
             );
 
 
@@ -116,6 +117,7 @@ class VpnSubscriptionController {
             !isHapp &&
             accept.includes("text/html");
 
+
         if (wantsHtml) {
             const subscriptionUrl =
                 `${req.protocol}://${req.get("host")}${req.originalUrl}`;
@@ -132,17 +134,18 @@ class VpnSubscriptionController {
             return;
         }
 
+
         res
             .status(200)
             .set({
                 "Content-Type":
-                    "text/plain; charset=utf-8",
+                    "application/json; charset=utf-8",
 
                 "Cache-Control":
                     "no-store",
             })
-            .send(
-                links.join("\n"),
+            .json(
+                configs,
             );
     }
 
