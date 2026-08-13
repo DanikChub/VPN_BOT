@@ -135,6 +135,13 @@ class VpnSubscriptionController {
         }
 
 
+        const expire =
+            Math.floor(
+                subscription.expires_at.getTime()
+                / 1000,
+            );
+
+
         res
             .status(200)
             .set({
@@ -143,23 +150,19 @@ class VpnSubscriptionController {
 
                 "Cache-Control":
                     "no-store",
-            })
-            .json({
-                name:
+
+                "profile-title":
                     "IORDAN VPN",
 
-                configs,
+                "subscription-userinfo":
+                    `upload=0; download=0; total=0; expire=${expire}`,
 
-                expiresAt:
-                    Math.floor(
-                        subscription.expires_at.getTime()
-                        /
-                        1000,
-                    ),
-
-                support:
+                "support-url":
                     "https://t.me/vpn_iordan_bot",
-            });
+            })
+            .json(
+                configs,
+            );
     }
 
 
