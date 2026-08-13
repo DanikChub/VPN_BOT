@@ -154,6 +154,9 @@ class VpnSubscriptionController {
                 "profile-title":
                     "IORDAN VPN",
 
+                "profile-update-interval":
+                    "1",
+
                 "subscription-userinfo":
                     `upload=0; download=0; total=0; expire=${expire}`,
 
