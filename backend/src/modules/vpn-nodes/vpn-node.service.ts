@@ -137,6 +137,34 @@ class VpnNodeService {
         });
     }
 
+    public async findAvailableExitNodes(): Promise<VpnNode[]> {
+        return VpnNode.findAll({
+            where: {
+                is_active: true,
+                status: "online",
+                role: "exit",
+            },
+
+            order: [
+                ["id", "ASC"],
+            ],
+        });
+    }
+
+    public async findAvailableGateways(): Promise<VpnNode[]> {
+        return VpnNode.findAll({
+            where: {
+                is_active: true,
+                status: "online",
+                role: "gateway",
+            },
+
+            order: [
+                ["id", "ASC"],
+            ],
+        });
+    }
+
 }
 
 

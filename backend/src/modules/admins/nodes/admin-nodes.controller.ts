@@ -183,6 +183,76 @@ class AdminNodesController {
             });
         }
     }
+
+    async installAgent(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+
+        try {
+
+            const nodeId =
+                Number(
+                    req.params.id,
+                );
+
+
+            if (
+                !Number.isInteger(nodeId) ||
+                nodeId <= 0
+            ) {
+                res.status(400).json({
+                    error:
+                        "Invalid node id",
+                });
+
+                return;
+            }
+
+
+            const sshPassword =
+                req.body?.sshPassword;
+
+
+            if (
+                typeof sshPassword !==
+                "string" ||
+                !sshPassword
+            ) {
+                res.status(400).json({
+                    error:
+                        "sshPassword is required",
+                });
+
+                return;
+            }
+
+
+            await adminNodesService
+                .installAgent(
+                    nodeId,
+                    sshPassword,
+                );
+
+
+            res.json({
+                nodeId,
+
+                installed:
+                    true,
+            });
+
+        } catch (error) {
+
+            res.status(500).json({
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : String(error),
+            });
+
+        }
+    }
 }
 
 

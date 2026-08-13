@@ -8,7 +8,7 @@ export interface AddXrayUserInput {
     inboundTag: string;
     uuid: string;
     email: string;
-    flow: "xtls-rprx-vision";
+    flow?: "xtls-rprx-vision";
 }
 
 
@@ -83,8 +83,12 @@ export class XrayUserService {
                 email:
                 input.email,
 
-                flow:
-                input.flow,
+                ...(input.flow
+                    ? {
+                        flow:
+                        input.flow,
+                    }
+                    : {}),
             },
         );
     }
@@ -283,8 +287,12 @@ export class XrayUserService {
 
                     email,
 
-                    flow:
-                    user.flow,
+                    ...(user.flow
+                        ? {
+                            flow:
+                            user.flow,
+                        }
+                        : {}),
                 },
             );
         }

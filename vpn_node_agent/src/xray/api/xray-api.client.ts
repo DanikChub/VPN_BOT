@@ -16,7 +16,7 @@ import {
 export interface XrayApiUser {
     uuid: string;
     email: string;
-    flow: "xtls-rprx-vision";
+    flow?: "xtls-rprx-vision";
 }
 
 
@@ -121,14 +121,25 @@ export class XrayApiClient {
             );
 
 
-        const accountMessage =
-            Account.create({
-                id:
-                user.uuid,
+        const accountData: {
+            id: string;
+            flow?: string;
+        } = {
+            id:
+            user.uuid,
+        };
 
-                flow:
-                user.flow,
-            });
+
+        if (user.flow) {
+            accountData.flow =
+                user.flow;
+        }
+
+
+        const accountMessage =
+            Account.create(
+                accountData,
+            );
 
 
         const accountBytes =

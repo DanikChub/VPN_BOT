@@ -14,7 +14,7 @@ export enum AgentCommandType {
 export interface XrayUser {
     uuid: string;
     email: string;
-    flow: "xtls-rprx-vision";
+    flow?: "xtls-rprx-vision";
 }
 
 export interface AddUsersCommandArguments {

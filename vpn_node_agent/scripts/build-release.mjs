@@ -70,6 +70,10 @@ function run(
     command,
     args,
 ) {
+    const useShell =
+        process.platform === "win32" &&
+        command === "npm";
+
     console.log(
         `[release] ${command} ${args.join(" ")}`,
     );
@@ -86,20 +90,15 @@ function run(
                     "inherit",
 
                 shell:
-                    process.platform ===
-                    "win32",
+                useShell,
             },
         );
 
-    if (
-        result.error
-    ) {
+    if (result.error) {
         throw result.error;
     }
 
-    if (
-        result.status !== 0
-    ) {
+    if (result.status !== 0) {
         throw new Error(
             `Command failed with exit code ${result.status}: ` +
             `${command} ${args.join(" ")}`,
@@ -254,8 +253,7 @@ async function main() {
                     "utf8",
 
                 shell:
-                    process.platform ===
-                    "win32",
+                    false,
             },
         );
 

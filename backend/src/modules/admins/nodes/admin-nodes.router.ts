@@ -57,5 +57,19 @@ adminNodesRouter.post(
     ),
 );
 
+adminNodesRouter.post(
+    "/:id/install-agent",
+
+    requirePermission(
+        "nodes.create",
+    ),
+
+    adminNodesController
+        .installAgent
+        .bind(
+            adminNodesController,
+        ),
+);
+
 
 export default adminNodesRouter;

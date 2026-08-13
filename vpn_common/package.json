@@ -2,6 +2,7 @@
   "name": "@vpn/common",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
 
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

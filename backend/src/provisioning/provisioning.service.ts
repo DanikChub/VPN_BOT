@@ -38,6 +38,20 @@ interface ProvisioningResult {
     realityShortId:string;
 }
 
+interface InstallAgentOptions {
+    nodeId: number;
+
+    host: string;
+
+    sshPort: number;
+    sshUser: string;
+    sshPassword: string;
+
+    token: string;
+
+    controlServerUrl: string;
+}
+
 class NodeProvisioningService {
     async install(
         options:InstallOptions,
@@ -162,6 +176,136 @@ class NodeProvisioningService {
         }
 
 
+    }
+
+    async installAgent(
+        options: InstallAgentOptions,
+    ): Promise<void> {
+
+        const ssh =
+            new SSHClient({
+                host:
+                options.host,
+
+                port:
+                options.sshPort,
+
+                username:
+                options.sshUser,
+
+                password:
+                options.sshPassword,
+            });
+
+
+        const scp =
+            new ScpClient({
+                host:
+                options.host,
+
+                port:
+                options.sshPort,
+
+                username:
+                options.sshUser,
+
+                password:
+                options.sshPassword,
+            });
+
+
+        await ssh.connect();
+
+
+        try {
+
+            await nodeInstallStepService.run(
+                options.nodeId,
+                "ssh_connect",
+                async () => {
+
+                    await ssh.exec(
+                        "echo SSH_CONNECTED",
+                    );
+
+                },
+            );
+
+
+            /*
+             * Агент написан на Node.js.
+             *
+             * Если Node уже установлен —
+             * NodeInstaller просто проверит его.
+             */
+            const nodeInstaller =
+                new NodeInstaller(
+                    ssh,
+                );
+
+
+            await nodeInstallStepService.run(
+                options.nodeId,
+                "install_node",
+                async () => {
+
+                    await nodeInstaller.install();
+
+                },
+            );
+
+
+            /*
+             * ВАЖНО:
+             *
+             * XrayInstaller и XrayConfigurator
+             * здесь намеренно отсутствуют.
+             *
+             * На gateway Xray уже настроен руками,
+             * и этот endpoint не должен его трогать.
+             */
+            const agentInstaller =
+                new AgentInstaller(
+                    ssh,
+                    scp,
+                );
+
+
+            await nodeInstallStepService.run(
+                options.nodeId,
+                "install_agent",
+                async () => {
+
+                    await agentInstaller.install({
+                        nodeId:
+                        options.nodeId,
+
+                        token:
+                        options.token,
+
+                        controlServerUrl:
+                        options.controlServerUrl,
+
+                        heartbeatIntervalMs:
+                            10000,
+                    });
+
+                },
+            );
+
+
+            await nodeInstallStepService.run(
+                options.nodeId,
+                "completed",
+                async () => {
+                },
+            );
+
+        } finally {
+
+            await ssh.close();
+
+        }
     }
 }
 

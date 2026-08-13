@@ -15,3 +15,17 @@ export interface ProvisioningOptions {
     agentToken:string;
 
 }
+
+interface InstallAgentOptions {
+    nodeId: number;
+
+    host: string;
+
+    sshPort: number;
+    sshUser: string;
+    sshPassword: string;
+
+    token: string;
+
+    controlServerUrl: string;
+}

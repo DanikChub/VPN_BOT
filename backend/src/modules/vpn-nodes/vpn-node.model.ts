@@ -58,6 +58,12 @@ class VpnNode extends Model<
     declare country_code: string | null;
 
     declare sort_order: CreationOptional<number>;
+
+    declare role: CreationOptional<
+        "exit" | "gateway"
+    >;
+
+    declare cdn_host: string | null;
 }
 
 VpnNode.init(
@@ -193,6 +199,20 @@ VpnNode.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,
+        },
+
+        role: {
+            type: DataTypes.ENUM(
+                "exit",
+                "gateway",
+            ),
+            allowNull: false,
+            defaultValue: "exit",
+        },
+
+        cdn_host: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
     },
     {

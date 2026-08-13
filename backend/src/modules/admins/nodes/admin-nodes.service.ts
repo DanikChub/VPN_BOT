@@ -331,6 +331,101 @@ class AdminNodesService {
                 );
         }
     }
+
+    public async installAgent(
+        nodeId: number,
+        sshPassword: string,
+    ): Promise<void> {
+
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+            );
+
+        console.log()
+
+        if (!node) {
+            throw new Error(
+                "VPN node not found",
+            );
+        }
+
+
+        if (!node.agent_token) {
+            throw new Error(
+                "Node agent token is missing",
+            );
+        }
+
+
+        const controlServerUrl =
+            process.env
+                .AGENT_CONTROL_SERVER_URL;
+
+
+        if (!controlServerUrl) {
+            throw new Error(
+                "AGENT_CONTROL_SERVER_URL is not configured",
+            );
+        }
+
+
+        await node.update({
+            install_status:
+                "installing",
+        });
+
+
+        try {
+
+            await nodeProvisioningService
+                .installAgent({
+                    nodeId:
+                    node.id,
+
+                    host:
+                    node.host,
+
+                    sshPort:
+                    node.ssh_port,
+
+                    sshUser:
+                    node.ssh_user,
+
+                    sshPassword,
+
+                    token:
+                    node.agent_token,
+
+                    controlServerUrl,
+                });
+
+
+            /*
+             * Тут НЕ ставим ready.
+             *
+             * Лучше дождаться HELLO от агента:
+             * твой markReady() сам переведёт
+             * ноду в ready/online.
+             */
+            await node.update({
+                install_status:
+                    "waiting_agent",
+            });
+
+        } catch (error) {
+
+            await node.update({
+                install_status:
+                    "failed",
+            });
+
+
+            throw error;
+        }
+    }
+
+
 }
 
 

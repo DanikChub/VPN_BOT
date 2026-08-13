@@ -36,7 +36,7 @@ class AgentNodeControlService
 
     public constructor(
         private readonly commandBus:
-        AgentCommandBus,
+            AgentCommandBus,
     ) {}
 
     public async addUser(
@@ -50,18 +50,10 @@ class AgentNodeControlService
                 node.inbound_tag,
 
                 users: [
-                    {
-                        uuid:
-                        credential.uuid,
-
-                        email:
-                            this.getCredentialEmail(
-                                credential,
-                            ),
-
-                        flow:
-                            "xtls-rprx-vision",
-                    },
+                    this.mapCredential(
+                        node,
+                        credential,
+                    ),
                 ],
             });
 
@@ -111,18 +103,11 @@ class AgentNodeControlService
 
                 users:
                     credentials.map(
-                        credential => ({
-                            uuid:
-                            credential.uuid,
-
-                            email:
-                                this.getCredentialEmail(
-                                    credential,
-                                ),
-
-                            flow:
-                                "xtls-rprx-vision",
-                        }),
+                        credential =>
+                            this.mapCredential(
+                                node,
+                                credential,
+                            ),
                     ),
             });
 
@@ -137,6 +122,28 @@ class AgentNodeControlService
         credential: VpnCredential,
     ): string {
         return `user_${credential.user_id}`;
+    }
+
+    private mapCredential(
+        node: VpnNode,
+        credential: VpnCredential,
+    ) {
+        return {
+            uuid:
+            credential.uuid,
+
+            email:
+                this.getCredentialEmail(
+                    credential,
+                ),
+
+            ...(node.role === "exit"
+                ? {
+                    flow:
+                        "xtls-rprx-vision" as const,
+                }
+                : {}),
+        };
     }
 }
 

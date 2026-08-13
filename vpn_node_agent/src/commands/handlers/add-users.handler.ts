@@ -44,17 +44,15 @@ export class AddUsersHandler {
                 );
 
             await this.xrayUserService.addUser({
-                inboundTag:
-                args.inboundTag,
+                inboundTag: args.inboundTag,
+                uuid: user.uuid,
+                email: user.email,
 
-                uuid:
-                user.uuid,
-
-                email:
-                user.email,
-
-                flow:
-                user.flow,
+                ...(user.flow
+                    ? {
+                        flow: user.flow,
+                    }
+                    : {}),
             });
 
             this.appliedUsersStore.addUser(
@@ -174,8 +172,8 @@ export class AddUsersHandler {
                     }
 
                     if (
-                        user.flow !==
-                        "xtls-rprx-vision"
+                        user.flow !== undefined &&
+                        user.flow !== "xtls-rprx-vision"
                     ) {
                         throw new Error(
                             `Unsupported Xray flow at index ${index}`,
@@ -201,8 +199,13 @@ export class AddUsersHandler {
 
                         email,
 
-                        flow:
-                        user.flow,
+                        ...(user.flow ===
+                        "xtls-rprx-vision"
+                            ? {
+                                flow:
+                                user.flow,
+                            }
+                            : {}),
                     };
                 },
             );

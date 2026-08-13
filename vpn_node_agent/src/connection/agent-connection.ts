@@ -387,7 +387,7 @@ export class AgentConnection {
         const requestId =
             commandMessage.requestId;
 
-        const payload =
+        const payload: CommandResultPayload =
             result !== null &&
             typeof result === "object" &&
             "success" in result
@@ -395,7 +395,9 @@ export class AgentConnection {
                 : {
                     success: false,
                     error: {
-                        code: "COMMAND_ERROR",
+                        code:
+                            "COMMAND_ERROR",
+
                         message:
                             "Invalid command result",
                     },
