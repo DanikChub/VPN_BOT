@@ -144,9 +144,22 @@ class VpnSubscriptionController {
                 "Cache-Control":
                     "no-store",
             })
-            .json(
+            .json({
+                name:
+                    "IORDAN VPN",
+
                 configs,
-            );
+
+                expiresAt:
+                    Math.floor(
+                        subscription.expires_at.getTime()
+                        /
+                        1000,
+                    ),
+
+                support:
+                    "https://t.me/vpn_iordan_bot",
+            });
     }
 
 
