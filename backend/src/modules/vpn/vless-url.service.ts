@@ -290,8 +290,9 @@ class VlessUrlService {
             },
 
             remarks:
-                node.display_name
-                ?? node.name,
+                this.buildHappRemarks(
+                    node,
+                ),
 
             routing: {
                 domainStrategy:
@@ -614,8 +615,9 @@ class VlessUrlService {
             },
 
             remarks:
-                node.display_name
-                ?? node.name,
+                this.buildHappRemarks(
+                    node,
+                ),
 
             routing: {
                 domainStrategy:
@@ -664,6 +666,49 @@ class VlessUrlService {
 
             stats: {},
         };
+    }
+
+    private buildHappRemarks(
+        node: VpnNode,
+    ): string {
+        const name =
+            node.display_name ??
+            node.name;
+
+        const flag =
+            this.countryCodeToFlag(
+                node.country_code,
+            );
+
+        return flag
+            ? `${flag} ${name}`
+            : name;
+    }
+
+
+    private countryCodeToFlag(
+        countryCode: string | null,
+    ): string | null {
+        if (
+            !countryCode ||
+            !/^[A-Za-z]{2}$/.test(
+                countryCode,
+            )
+        ) {
+            return null;
+        }
+
+        return countryCode
+            .toUpperCase()
+            .split("")
+            .map(
+                (char) =>
+                    String.fromCodePoint(
+                        127397 +
+                        char.charCodeAt(0),
+                    ),
+            )
+            .join("");
     }
 }
 

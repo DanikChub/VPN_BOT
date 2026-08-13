@@ -9,6 +9,7 @@ import type {
 
 import adminNodesService
     from "./admin-nodes.container";
+import {EditableNodeField} from "./admin-nodes.types";
 
 
 class AdminNodesController {
@@ -251,6 +252,192 @@ class AdminNodesController {
                         : String(error),
             });
 
+        }
+    }
+
+    async updateField(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            const nodeId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(nodeId) ||
+                nodeId <= 0
+            ) {
+                res.status(400).json({
+                    error:
+                        "Invalid node id",
+                });
+
+                return;
+            }
+
+            const {
+                field,
+                value,
+            } = req.body;
+
+            if (
+                typeof field !== "string" ||
+                !field
+            ) {
+                res.status(400).json({
+                    error:
+                        "field is required",
+                });
+
+                return;
+            }
+
+            const node =
+                await adminNodesService
+                    .updateField(
+                        nodeId,
+                        field as EditableNodeField,
+                        value,
+                    );
+
+            if (!node) {
+                res.status(404).json({
+                    error:
+                        "Node not found",
+                });
+
+                return;
+            }
+
+            res.json(node);
+
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : String(error);
+
+            if (
+                message.startsWith(
+                    "Invalid",
+                ) ||
+                message.includes(
+                    "is not editable",
+                )
+            ) {
+                res.status(400).json({
+                    error:
+                    message,
+                });
+
+                return;
+            }
+
+            res.status(500).json({
+                error:
+                message,
+            });
+        }
+    }
+
+    async getDetails(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            const nodeId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(nodeId) ||
+                nodeId <= 0
+            ) {
+                res.status(400).json({
+                    error:
+                        "Invalid node id",
+                });
+
+                return;
+            }
+
+            const node =
+                await adminNodesService
+                    .getDetails(
+                        nodeId,
+                    );
+
+            if (!node) {
+                res.status(404).json({
+                    error:
+                        "Node not found",
+                });
+
+                return;
+            }
+
+            res.json(node);
+
+        } catch (error) {
+            res.status(500).json({
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : String(error),
+            });
+        }
+    }
+
+    async delete(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            const nodeId =
+                Number(
+                    req.params.id,
+                );
+
+            if (
+                !Number.isInteger(nodeId) ||
+                nodeId <= 0
+            ) {
+                res.status(400).json({
+                    error:
+                        "Invalid node id",
+                });
+
+                return;
+            }
+
+            const deleted =
+                await adminNodesService
+                    .delete(
+                        nodeId,
+                    );
+
+            if (!deleted) {
+                res.status(404).json({
+                    error:
+                        "Node not found",
+                });
+
+                return;
+            }
+
+            res.json({
+                nodeId,
+
+                deleted:
+                    true,
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : String(error),
+            });
         }
     }
 }

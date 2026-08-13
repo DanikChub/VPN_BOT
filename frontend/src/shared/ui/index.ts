@@ -59,3 +59,5 @@ export {
     TableHeader,
     TableRow,
 } from "./Table";
+
+export * from "./DetailsRow";

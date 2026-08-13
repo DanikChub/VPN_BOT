@@ -425,6 +425,44 @@ class AdminNodesService {
         }
     }
 
+    public async getDetails(
+        nodeId: number,
+    ) {
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+                {
+                    attributes: {
+                        exclude: [
+                            "agent_token",
+                        ],
+                    },
+                },
+            );
+
+        if (!node) {
+            return null;
+        }
+
+        return node.toJSON();
+    }
+
+    public async delete(
+        nodeId: number,
+    ): Promise<boolean> {
+        const node =
+            await VpnNode.findByPk(
+                nodeId,
+            );
+
+        if (!node) {
+            return false;
+        }
+
+        await node.destroy();
+
+        return true;
+    }
 
 }
 

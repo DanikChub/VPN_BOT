@@ -12,6 +12,7 @@ import {
     routePaths,
 } from "@/shared/config/routePaths";
 import PlansPage from "@/pages/plans";
+import NodeDetailsPage from "@/pages/node-details";
 
 
 export interface AppRoute {
@@ -47,7 +48,13 @@ export const protectedRoutes: AppRoute[] = [
     },
 
     {
+        path: routePaths.nodeDetails,
+        element: <NodeDetailsPage/>
+    },
+
+    {
         path: routePaths.plans,
         element: <PlansPage />,
     },
+
 ];

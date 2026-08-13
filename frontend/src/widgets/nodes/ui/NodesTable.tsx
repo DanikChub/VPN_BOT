@@ -1,4 +1,5 @@
 import {
+    Button,
     Table,
     TableBody,
     TableCell, TableContainer,
@@ -11,15 +12,24 @@ import {
     VpnNodeStatusBadge,
     type VpnNode,
 } from "@/entities/vpn-node";
+import {DeleteIcon, Eye} from "lucide-react";
 
 
 interface Props {
     nodes: VpnNode[];
+    onOpenNode: (
+        nodeId: number
+    ) => void;
+    onDeleteNode: (
+        nodeId: number
+    ) => void;
 }
 
 
 const NodesTable = ({
                         nodes,
+                        onOpenNode,
+                        onDeleteNode
                     }: Props) => {
 
 
@@ -57,6 +67,10 @@ const NodesTable = ({
 
                         <TableHead>
                             Uptime
+                        </TableHead>
+
+                        <TableHead className="w-16 text-center">
+                            Действия
                         </TableHead>
 
                     </TableRow>
@@ -104,18 +118,18 @@ const NodesTable = ({
 
                             <TableCell>
 
-                                {node.cpu.count ?? "-"}
+                                {node.cpu_count ?? "-"}
                                 {" "}
-                                {node.cpu.model}
+                                {node.cpu_model}
 
                             </TableCell>
 
 
                             <TableCell>
 
-                                {node.memory.used
+                                {node.memory_used
                                     ? `${Math.round(
-                                        node.memory.used /
+                                        node.memory_used /
                                         1024 /
                                         1024 /
                                         1024
@@ -128,15 +142,41 @@ const NodesTable = ({
 
                             <TableCell>
 
-                                {node.uptimeSeconds
+                                {node.uptime_seconds
                                     ? `${Math.floor(
-                                        node.uptimeSeconds / 3600
+                                        node.uptime_seconds / 3600
                                     )} ч`
                                     : "-"
                                 }
 
                             </TableCell>
 
+
+                            <TableCell className="text-right">
+                                <div className="flex space-x-2">
+                                    <Button
+                                        aria-label="Открыть узел"
+                                        onClick={() => {
+                                            onOpenNode(node.id);
+                                        }}
+                                        size="icon"
+                                        variant="ghost"
+                                    >
+                                        <Eye className="size-4" />
+                                    </Button>
+                                    <Button
+                                        aria-label="Удалить узел"
+                                        onClick={() => {
+                                            onDeleteNode(node.id);
+                                        }}
+                                        size="icon"
+                                        variant="danger"
+                                    >
+                                        <DeleteIcon className="size-4" />
+                                    </Button>
+                                </div>
+
+                            </TableCell>
 
                         </TableRow>
 

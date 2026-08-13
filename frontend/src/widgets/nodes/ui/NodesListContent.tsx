@@ -8,14 +8,20 @@ interface VpnNodeContentProps {
     nodes: VpnNode[];
     isLoading: boolean;
     errorMessage: string | null;
-
+    onOpenNode: (
+        nodeId: number
+    ) => void;
+    onDeleteNode: (
+        nodeId: number
+    ) => void;
 }
 
 const UsersListContent = ({
                               nodes,
                               isLoading,
                               errorMessage,
-
+                              onOpenNode,
+                              onDeleteNode
 
                           }: VpnNodeContentProps) => {
     if (errorMessage) {
@@ -54,6 +60,8 @@ const UsersListContent = ({
     return (
         <NodesTable
             nodes={nodes}
+            onOpenNode={onOpenNode}
+            onDeleteNode={onDeleteNode}
         />
     );
 }

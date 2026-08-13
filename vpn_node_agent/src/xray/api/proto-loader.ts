@@ -1,4 +1,4 @@
-import fs from "node:fs";
+himport fs from "node:fs";
 import path from "node:path";
 
 import {
@@ -47,7 +47,7 @@ export async function loadXrayProto():
             "proxy",
             "vless",
             "account.proto",
-        ),
+        ),h
 
         path.join(
             protoRoot,

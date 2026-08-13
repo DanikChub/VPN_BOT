@@ -6,6 +6,7 @@ export const routePaths = {
     userDetails: "/users/:id",
 
     nodes: "/nodes",
+    nodeDetails: "/nodes/:id",
 
     payments: "/payments",
 
@@ -18,4 +19,10 @@ export function getUserDetailsPath(
     userId: number
 ): string {
     return `/users/${userId}`;
+}
+
+export function getNodeDetailsPath(
+    nodeId: number
+): string {
+    return `/nodes/${nodeId}`;
 }

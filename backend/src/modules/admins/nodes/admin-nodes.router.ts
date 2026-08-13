@@ -71,5 +71,45 @@ adminNodesRouter.post(
         ),
 );
 
+adminNodesRouter.patch(
+    "/:id",
+    requirePermission(
+        "nodes.update",
+    ),
+    adminNodesController
+        .updateField
+        .bind(
+            adminNodesController,
+        ),
+);
+
+adminNodesRouter.get(
+    "/:id/details",
+
+    requirePermission(
+        "nodes.read",
+    ),
+
+    adminNodesController
+        .getDetails
+        .bind(
+            adminNodesController,
+        ),
+);
+
+adminNodesRouter.delete(
+    "/:id",
+
+    requirePermission(
+        "nodes.delete",
+    ),
+
+    adminNodesController
+        .delete
+        .bind(
+            adminNodesController,
+        ),
+);
+
 
 export default adminNodesRouter;
