@@ -8,6 +8,9 @@ export const routePaths = {
     nodes: "/nodes",
     nodeDetails: "/nodes/:id",
 
+    marketingSources: "/marketing-sources",
+    marketingSourceDetails: "/marketing-sources/:id",
+
     payments: "/payments",
 
     plans: "/plans",
@@ -25,4 +28,12 @@ export function getNodeDetailsPath(
     nodeId: number
 ): string {
     return `/nodes/${nodeId}`;
+}
+
+export function getMarketingSourceDetailsPath(
+    marketingSourceId:number
+): string {
+
+    return `/marketing-sources/${marketingSourceId}`;
+
 }

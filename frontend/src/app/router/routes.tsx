@@ -13,6 +13,8 @@ import {
 } from "@/shared/config/routePaths";
 import PlansPage from "@/pages/plans";
 import NodeDetailsPage from "@/pages/node-details";
+import MarketingSourcesPage from "@/pages/marketing-sources";
+import MarketingSourceDetailsPage from "@/pages/marketing-source-details";
 
 
 export interface AppRoute {
@@ -55,6 +57,15 @@ export const protectedRoutes: AppRoute[] = [
     {
         path: routePaths.plans,
         element: <PlansPage />,
+    },
+
+    {
+        path: routePaths.marketingSources,
+        element: <MarketingSourcesPage/>
+    },
+    {
+        path: routePaths.marketingSourceDetails,
+        element: <MarketingSourceDetailsPage/>
     },
 
 ];

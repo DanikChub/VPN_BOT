@@ -18,6 +18,7 @@ class User extends Model<
 
     declare balance_amount: CreationOptional<number>;
 
+    declare marketing_source_id: number | null;
 
     declare username: string | null;
     declare firstName: string | null;
@@ -46,6 +47,12 @@ User.init(
             type: DataTypes.BIGINT,
             allowNull: false,
             defaultValue: 0,
+        },
+
+        marketing_source_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            field: "marketing_source_id",
         },
 
         username: {

@@ -10,11 +10,12 @@ class UserController {
         req: Request,
         res: Response,
     ): Promise<void> {
-       const {
-           telegramId,
-           username,
-           firstName
-       } = req.body;
+        const {
+            telegramId,
+            username,
+            firstName,
+            startPayload,
+        } = req.body;
 
         if (!telegramId) {
             res.status(400).json({
@@ -26,9 +27,10 @@ class UserController {
 
         const user =
             await userService.findOrCreateTelegramUser({
-                telegramId: String(telegramId),
+                telegramId:String(telegramId),
                 username: username ?? null,
                 firstName: firstName ?? null,
+                startPayload,
             });
 
         res.json({

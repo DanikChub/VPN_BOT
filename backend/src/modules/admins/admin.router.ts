@@ -5,6 +5,7 @@ import { authenticateAdmin } from "./middleware/authenticate-admin.middleware";
 import adminUsersRouter from "./users/admin-users.router";
 import adminNodesRouter from "./nodes/admin-nodes.router";
 import adminPlansRouter from "./plans/admin-plans.router";
+import adminMarketingSourseRouter from "./marketing-sources/marketing-source.router";
 
 const adminRouter = Router();
 
@@ -32,5 +33,9 @@ adminRouter.use(
     adminPlansRouter
 );
 
+adminRouter.use(
+    "/marketing-sources",
+    adminMarketingSourseRouter
+);
 
 export default adminRouter;

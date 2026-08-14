@@ -145,12 +145,32 @@ export async function mainMenuHandler(
         return;
     }
 
+    let startPayload: string | undefined;
+
+
+    if (
+        ctx.message &&
+        "text" in ctx.message &&
+        ctx.message.text.startsWith("/start")
+    ) {
+        const parts =
+            ctx.message.text
+                .trim()
+                .split(/\s+/);
+
+        startPayload =
+            parts.length > 1
+                ? parts[1]
+                : undefined;
+    }
+
     try {
         const user =
             await getTelegramUserInfo(
                 ctx.from.id,
                 ctx.from.username,
-                ctx.from.first_name
+                ctx.from.first_name,
+                startPayload
             );
 
         const subscription =

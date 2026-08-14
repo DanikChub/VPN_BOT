@@ -17,18 +17,24 @@ export interface TelegramUserInfo {
 export async function getTelegramUserInfo(
     telegramId: number,
     username?: string,
-    firstName?: string
-): Promise<TelegramUserInfo> {
-    const response = await backendApi.post(
-        "/api/users/telegram",
-        {
-            telegramId: String(telegramId),
-            username: username ?? null,
-            firstName: firstName ?? null,
-        }
-    );
+    firstName?: string,
+    startPayload?: string,
+) {
 
-    console.log(response)
+    const response =
+        await backendApi.post(
+            "/api/users/register",
+            {
+                telegramId,
+
+                username,
+
+                firstName,
+
+                startPayload,
+            }
+        );
+
 
     return response.data;
 }

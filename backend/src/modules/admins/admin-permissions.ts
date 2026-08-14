@@ -25,6 +25,11 @@ export const adminPermissions = [
     "nodes.delete",
     "nodes.sync",
 
+    "marketing_sources.read",
+    "marketing_sources.create",
+    "marketing_sources.update",
+    "marketing_sources.delete",
+
     "admins.read",
     "admins.create",
     "admins.update",
@@ -63,6 +68,11 @@ const rolePermissions: Record<
         "nodes.create",
         "nodes.update",
         "nodes.sync",
+
+        "marketing_sources.read",
+        "marketing_sources.create",
+        "marketing_sources.update",
+        "marketing_sources.delete",
     ],
 
     support: [
@@ -71,6 +81,7 @@ const rolePermissions: Record<
         "plans.read",
         "payments.read",
         "nodes.read",
+        "marketing_sources.read",
     ],
 };
 
