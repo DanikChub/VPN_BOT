@@ -65,7 +65,7 @@ jobs:
           push: true
 
           build-args: |
-            ${{ matrix.name == 'frontend' && 'VITE_API_URL=/api' || '' }}
+            ${{ matrix.name == 'frontend' && 'VITE_API_URL=https://api.iordan.bar/api' || '' }}
 
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
@@ -91,7 +91,7 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
-          source: docker-compose.production.yml
+          source: "docker-compose.production.yml,nginx/default.conf"
           target: /opt/vpn
 
       - name: Deploy
