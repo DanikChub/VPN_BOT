@@ -25,17 +25,15 @@ export interface AdminNodeResponse {
 
     lastSeenAt: Date | null;
 
-    cpu: {
-        count: number | null;
-        model: string | null;
-    };
+    cpu_count: number | null;
+    cpu_model: string | null;
 
-    memory: {
-        total: number | null;
-        used: number | null;
-    };
 
-    uptimeSeconds: number | null;
+    memory_total: number | null;
+    memory_used: number | null;
+
+
+    uptime_seconds: number | null;
 }
 
 
@@ -52,27 +50,19 @@ export function mapNodeToAdminResponse(
 
         status: node.status,
 
-        lastSeenAt:
-            node.last_seen_at,
+        lastSeenAt: node.last_seen_at,
 
-        cpu: {
-            count:
-                node.cpu_count,
 
-            model:
-                node.cpu_model,
-        },
+        cpu_count:node.cpu_count,
 
-        memory: {
-            total:
-                node.memory_total,
+        cpu_model: node.cpu_model,
 
-            used:
-                node.memory_used,
-        },
 
-        uptimeSeconds:
-            node.uptime_seconds,
+        memory_total: node.memory_total,
+
+        memory_used: node.memory_used,
+
+        uptime_seconds: node.uptime_seconds,
     };
 }
 
