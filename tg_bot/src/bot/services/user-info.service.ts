@@ -23,7 +23,7 @@ export async function getTelegramUserInfo(
 
     const response =
         await backendApi.post(
-            "/api/users/register",
+            "/api/users/telegram",
             {
                 telegramId,
 
