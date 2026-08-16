@@ -187,19 +187,7 @@ export class XrayConfigurator {
                 domainStrategy:
                     "AsIs",
 
-                rules: [
-                    {
-                        type:
-                            "field",
-
-                        inboundTag: [
-                            "api",
-                        ],
-
-                        outboundTag:
-                            "api",
-                    },
-                ],
+                rules: [],
             },
         };
 
@@ -356,33 +344,66 @@ systemctl restart xray
 
     private async verify() {
 
+        const maxAttempts = 20;
+
+        for (
+            let attempt = 1;
+            attempt <= maxAttempts;
+            attempt++
+        ) {
+
+            const status =
+                await this.ssh.exec(`
+systemctl is-active xray || true
+`);
+
+            const normalizedStatus =
+                status.trim();
+
+
+            if (
+                normalizedStatus ===
+                "active"
+            ) {
+                return;
+            }
+
+
+            if (
+                normalizedStatus ===
+                "failed"
+            ) {
+                break;
+            }
+
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        500,
+                    ),
+            );
+        }
+
 
         const status =
             await this.ssh.exec(`
-systemctl is-active xray
+systemctl is-active xray || true
 `);
 
 
-
-        if (
-            status.trim() !==
-            "active"
-        ) {
-
-
-            const logs =
-                await this.ssh.exec(`
+        const logs =
+            await this.ssh.exec(`
 journalctl -u xray -n 100 --no-pager
 `);
 
 
-
-            throw new Error(
-                `Xray failed to start:\n${logs}`,
-            );
-
-        }
-
+        throw new Error(
+            `Xray failed to start.\n` +
+            `Status: ${status.trim()}\n\n` +
+            logs,
+        );
     }
 
     private async verifyApi() {
